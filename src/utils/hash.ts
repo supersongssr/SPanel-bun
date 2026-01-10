@@ -1,44 +1,39 @@
-import { createHash } from 'crypto';
-import { getConfig } from '../config/app';
+import bcrypt from 'bcrypt'
 
 /**
- * MD5 带盐加密
+ * Hash password using bcrypt
  */
-function md5WithSalt(pwd: string, salt: string): string {
-  return createHash('md5')
-    .update(pwd + salt)
-    .digest('hex');
+export async function hashPassword(password: string): Promise<string> {
+  const salt = await bcrypt.genSalt(10)
+  return bcrypt.hash(password, salt)
 }
 
 /**
- * SHA-256 带盐加密
+ * Verify password against hash
  */
-function sha256WithSalt(pwd: string, salt: string): string {
-  return createHash('sha256')
-    .update(pwd + salt)
-    .digest('hex');
+export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash)
 }
 
 /**
- * 对齐旧版 SPanel 密码加密规范
+ * Generate random string
  */
-export function passwordHash(pwd: string): string {
-  const method = getConfig('pwdMethod', 'sha256');
-  const salt = getConfig('salt', '');
-
-  switch (method) {
-    case 'md5':
-      return md5WithSalt(pwd, salt);
-    case 'sha256':
-      return sha256WithSalt(pwd, salt);
-    default:
-      return sha256WithSalt(pwd, salt);
+export function generateRandomString(length: number = 32): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let result = ''
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
   }
+  return result
 }
 
 /**
- * 校验用户输入的密码是否与数据库存储的密码哈希匹配
+ * Generate UUID
  */
-export function checkPassword(hashedPassword: string, inputPassword: string): boolean {
-  return hashedPassword === passwordHash(inputPassword);
+export function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0
+    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
 }

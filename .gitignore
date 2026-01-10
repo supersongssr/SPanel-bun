@@ -3,3 +3,4 @@ tmp/
 .mysql_credentials
 .env
 node_modules/
+.claude/
