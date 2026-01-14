@@ -1,18 +1,16 @@
 /**
- * Authentication Middleware - JWT Verification
+ * Admin Authentication Middleware
  * 
- * Extracts and verifies JWT token from Authorization header
- * Injects userId and user info into request context
+ * Verifies that the user has admin privileges (is_admin === 1)
  */
 
 import { Elysia } from 'elysia'
 
-export const authMiddleware = new Elysia({ name: 'auth-middleware' })
+export const adminAuthMiddleware = new Elysia({ name: 'admin-auth' })
   .derive(async ({ jwt, request, set }) => {
     // Extract Authorization header
     const authHeader = request.headers.get('Authorization')
     
-    // Check if header exists and has Bearer token
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       set.status = 401
       return {
@@ -21,7 +19,7 @@ export const authMiddleware = new Elysia({ name: 'auth-middleware' })
       }
     }
 
-    // Extract token (remove "Bearer " prefix)
+    // Extract token
     const token = authHeader.substring(7)
     
     // Verify token
@@ -35,11 +33,22 @@ export const authMiddleware = new Elysia({ name: 'auth-middleware' })
       }
     }
 
+    // Check if user is admin
+    const isAdmin = (payload as any).isAdmin === true
+    
+    if (!isAdmin) {
+      set.status = 403
+      return {
+        error: 'Forbidden',
+        message: 'Admin privileges required',
+      }
+    }
+
     // Inject user info into context
     return {
       userId: (payload as any).userId as number,
       userEmail: (payload as any).email as string,
       userName: (payload as any).user_name as string,
-      isAdmin: (payload as any).isAdmin as boolean,
+      isAdmin: true,
     }
   })

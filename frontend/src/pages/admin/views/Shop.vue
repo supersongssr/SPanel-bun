@@ -151,6 +151,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { apiClient } from '@/shared/api/client'
 
 // 表格数据
 const tableData = ref([])
@@ -201,18 +202,16 @@ const getGroupType = (group: number) => {
 const loadData = async () => {
   loading.value = true
   try {
-    // TODO: 调用API获取商品列表
-    // const response = await axios.get('/api/admin/shop', {
-    //   params: pagination
-    // })
-    // tableData.value = response.data.data
-    // pagination.total = response.data.total
-
-    // 模拟数据
-    tableData.value = []
-    pagination.total = 0
-  } catch (error) {
-    ElMessage.error('加载数据失败')
+    const response = await apiClient.admin.shop.get({
+      query: {
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+      },
+    })
+    tableData.value = response.products || []
+    pagination.total = response.pagination?.total || 0
+  } catch (error: any) {
+    ElMessage.error(error.message || '加载数据失败')
   } finally {
     loading.value = false
   }
@@ -245,57 +244,92 @@ const handleEdit = (row: any) => {
 }
 
 // 删除
-const handleDelete = (row: any) => {
+const handleDelete = async (row: any) => {
   ElMessageBox.confirm('确定要删除该商品吗?', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
   }).then(async () => {
     try {
-      // TODO: 调用API删除商品
-      // await axios.delete(`/api/admin/shop/${row.id}`)
+      await apiClient.admin.shop[':id']().delete({
+        params: {
+          id: row.id.toString(),
+        },
+      })
       ElMessage.success('删除成功')
       loadData()
-    } catch (error) {
-      ElMessage.error('删除失败')
+    } catch (error: any) {
+      ElMessage.error(error.message || '删除失败')
     }
   })
 }
 
 // 切换状态
-const handleToggleStatus = (row: any) => {
+const handleToggleStatus = async (row: any) => {
   const action = row.status ? '下架' : '上架'
-  ElMessageBox.confirm(`确定要${action}该商品吗?`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  }).then(async () => {
-    try {
-      // TODO: 调用API切换状态
-      // await axios.put(`/api/admin/shop/${row.id}/status`, { status: !row.status })
-      ElMessage.success(`${action}成功`)
-      loadData()
-    } catch (error) {
-      ElMessage.error(`${action}失败`)
+  try {
+    await ElMessageBox.confirm(`确定要${action}该商品吗?`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    })
+
+    await apiClient.admin.shop[':id']().put({
+      params: {
+        id: row.id.toString(),
+      },
+      body: {
+        ...row,
+        status: !row.status,
+      },
+    })
+    ElMessage.success(`${action}成功`)
+    loadData()
+  } catch (error: any) {
+    if (error !== 'cancel') {
+      ElMessage.error(error.message || `${action}失败`)
     }
-  })
+  }
 }
 
 // 提交表单
 const handleSubmit = async () => {
   await formRef.value.validate()
   try {
-    // TODO: 调用API保存商品
-    // if (form.id) {
-    //   await axios.put(`/api/admin/shop/${form.id}`, form)
-    // } else {
-    //   await axios.post('/api/admin/shop', form)
-    // }
+    // Build content object from form fields
+    const content: any = {}
+    if (form.traffic) content.traffic = `${form.traffic}GB`
+    if (form.class) content.class = form.class
+    if (form.expire) content.expire = `${form.expire}天`
+    if (form.node_group) content.node_group = form.node_group
+
+    const productData = {
+      name: form.name,
+      price: form.price,
+      content: JSON.stringify(content),
+      auto_renew: false,
+      auto_reset_bandwidth: false,
+      status: form.status,
+    }
+
+    if (form.id) {
+      await apiClient.admin.shop[':id']().put({
+        params: {
+          id: form.id.toString(),
+        },
+        body: productData,
+      })
+    } else {
+      await apiClient.admin.shop.post({
+        body: productData,
+      })
+    }
+
     ElMessage.success('保存成功')
     dialogVisible.value = false
     loadData()
-  } catch (error) {
-    ElMessage.error('保存失败')
+  } catch (error: any) {
+    ElMessage.error(error.message || '保存失败')
   }
 }
 
