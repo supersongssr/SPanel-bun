@@ -16,28 +16,26 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://test-spanel-b
  * Create Eden Client with automatic token injection
  */
 export const api: any = edenTreaty(API_BASE_URL, {
-  fetcher: {
-    fetch: async (input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> => {
-      // Get token from AuthManager
-      const token = auth.getToken()
+  async fetcher(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
+    // Get token from AuthManager
+    const token = auth.getToken()
 
-      // Merge headers
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-        ...(init.headers as Record<string, string>),
-      }
+    // Merge headers
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(init.headers as Record<string, string>),
+    }
 
-      // Add auth header if token exists
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-      }
+    // Add auth header if token exists
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
 
-      // Make fetch request with auth header
-      return fetch(input, {
-        ...init,
-        headers,
-      })
-    },
+    // Make fetch request with auth header
+    return fetch(input, {
+      ...init,
+      headers,
+    })
   },
 })
 

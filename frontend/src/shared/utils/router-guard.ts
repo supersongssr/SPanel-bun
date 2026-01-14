@@ -14,6 +14,24 @@ const PUBLIC_PAGES = [
   '/register.html',
   '/user/login.html',
   '/user/register.html',
+  '/auth/',
+  '/auth/index.html',
+  '/auth/login.html',
+  '/auth/register.html',
+  '/auth/resetpassword.html',
+]
+
+/**
+ * Pages where logged-in users should be redirected based on role (SSO)
+ */
+const SSO_REDIRECT_PAGES = [
+  '/',
+  '/index.html',
+  '/auth/',
+  '/auth/index.html',
+  '/auth/login.html',
+  '/auth/register.html',
+  '/auth/resetpassword.html',
 ]
 
 /**
@@ -48,6 +66,36 @@ function isAdminPage(): boolean {
 }
 
 /**
+ * Check if current page should trigger SSO redirect
+ */
+function shouldSSORedirect(): boolean {
+  const currentPath = window.location.pathname
+
+  return SSO_REDIRECT_PAGES.some(page => {
+    return currentPath === page || currentPath.startsWith(page)
+  })
+}
+
+/**
+ * SSO Auto-redirect based on user role
+ * Redirects logged-in users to their appropriate dashboard
+ * User-first approach: All users (including admins) go to /user/index by default
+ */
+function handleSSORedirect(): void {
+  const currentUrl = window.location.href
+
+  // Don't redirect if already on a dashboard page
+  if (currentUrl.includes('/user/index.html') || currentUrl.includes('/admin/index.html')) {
+    return
+  }
+
+  // User-first SSO: All logged-in users redirect to /user/index.html
+  // Admins can access admin panel via navigation from user dashboard
+  console.log('SSO: User logged in, redirecting to /user/index.html')
+  window.location.href = '/user/index.html'
+}
+
+/**
  * Main authentication guard function
  *
  * Call this in your main.ts or App.vue before mounting the app
@@ -55,16 +103,16 @@ function isAdminPage(): boolean {
  * @returns true if authenticated, false if redirected
  */
 export function checkAuth(): boolean {
-  // Skip check for public pages
-  if (isPublicPage()) {
-    return true
-  }
-
   // Check if user is logged in
   if (!auth.isLoggedIn()) {
-    // Not logged in - redirect to login
+    // Not logged in - only allow public pages
+    if (isPublicPage()) {
+      return true
+    }
+
+    // Redirect to login
     const currentUrl = window.location.href
-    const loginUrl = isAdminPage() ? '/admin/login.html' : '/user/login.html'
+    const loginUrl = isAdminPage() ? '/admin/login.html' : '/auth/'
 
     console.warn('User not authenticated, redirecting to login...')
 
@@ -74,6 +122,13 @@ export function checkAuth(): boolean {
     }
 
     window.location.href = loginUrl
+    return false
+  }
+
+  // User is logged in - check for SSO redirect
+  if (shouldSSORedirect()) {
+    console.log('SSO: User logged in on public/auth page, redirecting to dashboard...')
+    handleSSORedirect()
     return false
   }
 
@@ -89,7 +144,7 @@ export function checkAuth(): boolean {
     if (!auth.isAdmin()) {
       console.warn('Access denied: Admin privileges required')
       alert('需要管理员权限才能访问此页面')
-      window.location.href = '/index.html'
+      window.location.href = '/user/index.html'
       return false
     }
   }

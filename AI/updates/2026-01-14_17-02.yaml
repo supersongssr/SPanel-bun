@@ -1,0 +1,45 @@
+when: 2026-01-14T17:02:00+08:00
+where:
+  - frontend/public/user/dashboard.html (renamed to index.html)
+  - frontend/public/user/index.html (created, script reference fixed)
+  - frontend/vite.config.ts (input mappings updated)
+  - frontend/src/shared/utils/router-guard.ts (SSO redirect updated)
+  - /etc/nginx/conf.d/test-spanel-bun.freessr.bid.conf (already correct)
+  - frontend/dist/ (rebuilt)
+  - tests/route-simplification-simple.spec.ts (created)
+  - playwright.config.ts (created)
+
+why:
+  - Standardize route naming: /user/dashboard.html → /user/index.html
+  - Simplify user dashboard access to standard directory index
+  - Implement user-first SSO: all logged-in users redirect to /user/ by default
+  - Clean up routing inconsistencies
+
+how:
+  1. Renamed frontend/public/user/dashboard.html to frontend/public/user/index.html
+  2. Fixed script reference in index.html from index-main.ts to dashboard-main.ts
+  3. Updated vite.config.ts:
+     - Changed input from 'user/dashboard' to 'user/index'
+     - Updated build script to copy index.html instead of dashboard.html
+  4. Updated router-guard.ts:
+     - Changed admin access denied redirect from /user/dashboard.html to /user/index.html
+     - SSO logic already correctly redirects to /user/index.html
+  5. Nginx configuration already correct (index index.html in /user/ location block)
+  6. Rebuilt frontend with bunx vite build
+  7. Reloaded nginx configuration
+  8. Created and ran Playwright tests to validate changes
+
+must:
+  - All user dashboard access now through /user/ (serves index.html)
+  - SSO redirects all logged-in users to /user/index.html regardless of admin status
+  - Admins can still access admin panel via navigation from user dashboard
+  - Tests validate:
+    ✅ /user/ serves index.html correctly
+    ✅ /user/index.html directly accessible
+    ✅ Authenticated users can access /user/ dashboard
+
+test_results:
+  - Playwright tests: 3/3 passed
+  - HTTP tests: /user/ returns 200 OK
+  - Page title verification: "用户控制台 - SPanel" ✓
+  - API login test: Working ✓

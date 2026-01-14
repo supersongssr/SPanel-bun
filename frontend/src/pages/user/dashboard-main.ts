@@ -1,6 +1,6 @@
 /**
  * User Dashboard Entry Point
- * 
+ *
  * MPA模式下每个页面都有自己的入口文件
  */
 
