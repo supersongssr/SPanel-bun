@@ -206,7 +206,7 @@ export async function handleRegister(body: any, set: any) {
   const defaultTraffic = 10737418240n;
 
   // 6. 执行写入用户注册
-  const insertResult = await db.insert(userTable).values({
+  await db.insert(userTable).values({
     userName,
     email,
     pass: passHash,

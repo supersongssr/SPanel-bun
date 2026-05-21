@@ -40,8 +40,8 @@ export const userTable = mysqlTable('user', {
   sendDailyMail: int('sendDailyMail').default(0).notNull(),
   class: int('class').default(0).notNull(), // 会员等级
   renew: int('renew').default(0), // 自动续费开关
-  classExpire: datetime('class_expire').defaultFn(() => new Date('1989-06-04 00:05:00')).notNull(), // 等级过期时间
-  expireIn: datetime('expire_in').defaultFn(() => new Date('2099-06-04 00:05:00')).notNull(), // 账户过期时间
+  classExpire: datetime('class_expire').$defaultFn(() => new Date('1989-06-04 00:05:00')).notNull(), // 等级过期时间
+  expireIn: datetime('expire_in').$defaultFn(() => new Date('2099-06-04 00:05:00')).notNull(), // 账户过期时间
   theme: varchar('theme', { length: 255 }).default('default').notNull(),
   gaToken: varchar('ga_token', { length: 255 }).default('').notNull(), // 2FA Token
   gaEnable: int('ga_enable').default(0).notNull(),

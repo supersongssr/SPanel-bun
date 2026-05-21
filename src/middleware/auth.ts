@@ -34,7 +34,7 @@ export async function verifyToken(token: string): Promise<{ userId: number; isAd
 /**
  * Elysia 专用的声明式 JWT 会话派生中间件
  */
-export async function authDerive({ request, set }: { request: Request; set: any }) {
+export async function authDerive({ request }: { request: Request }) {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return { userId: null, isAdmin: false };

@@ -38,7 +38,7 @@ export async function ipBlockGuard({ ip, set }: { ip: string; set: any }) {
   // 此处可扩展读取 Redis 禁封库：const isBanned = await redis.sismember('spanel:banned:ips', ip);
   const isBanned = false; // 占位，可在阶段四进行全面实装
   
-  if (isBanned) {
+  if (isBanned && ip) {
     set.status = 403;
     return {
       status: 'error',

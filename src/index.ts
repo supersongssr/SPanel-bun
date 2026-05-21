@@ -28,10 +28,10 @@ const app = new Elysia()
   .derive(authDerive)
   
   // 3. 安全前置防御 (IP 封禁与防御层)
-  .beforeHandle(ipBlockGuard)
+  .onBeforeHandle(ipBlockGuard)
 
   // 4. 全局 BigInt 递归序列化为 String 的拦截器 (防精度溢出与 JSON 崩溃)
-  .mapResponse(({ response }) => {
+  .mapResponse(({ response }: { response: any }) => {
     if (response instanceof Response) return response;
     
     const serializeBigInt = (obj: any): any => {
@@ -54,7 +54,7 @@ const app = new Elysia()
   })
 
   // 5. 错误捕获控制域 (统一返回简体中文错误提示)
-  .onError(({ error, code, set }) => {
+  .onError(({ error, code, set }: { error: any; code: any; set: any }) => {
     console.error(`[API Error] Code: ${code} | Message:`, error.message);
     
     set.headers['Content-Type'] = 'application/json; charset=utf-8';
