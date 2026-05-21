@@ -1,0 +1,4 @@
+.links/
+tmp/
+.mysql_credentials
+.env
