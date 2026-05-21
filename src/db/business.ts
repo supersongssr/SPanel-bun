@@ -1,4 +1,5 @@
 import { mysqlTable, serial, int, varchar, bigint, decimal, tinyint, text, datetime } from 'drizzle-orm/mysql-core';
+import { sql } from 'drizzle-orm';
 
 // 套餐商品表
 export const shopTable = mysqlTable('shop', {
@@ -31,7 +32,7 @@ export const paylistTable = mysqlTable('paylist', {
   tradeno: text('tradeno'), // 支付网关交易单号
   type: int('type').default(0), // 支付渠道 (如支付宝、微信)
   url: varchar('url', { length: 255 }), // 支付网关跳转链接
-  datetime: bigint('datetime', { mode: 'bigint' }).default(0n).notNull(),
+  datetime: bigint('datetime', { mode: 'bigint' }).default(sql`0`).notNull(),
 });
 
 // 邀请人推广返利流水表

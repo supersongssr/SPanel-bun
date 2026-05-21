@@ -1,4 +1,5 @@
 import { mysqlTable, serial, int, varchar, bigint, decimal, tinyint, datetime } from 'drizzle-orm/mysql-core';
+import { sql } from 'drizzle-orm';
 
 // 核心用户表
 export const userTable = mysqlTable('user', {
@@ -13,7 +14,7 @@ export const userTable = mysqlTable('user', {
   d: bigint('d', { mode: 'bigint' }).notNull(), // 下行流量 (bytes)
   plan: varchar('plan', { length: 2 }).default('A').notNull(),
   transferEnable: bigint('transfer_enable', { mode: 'bigint' }).notNull(), // 总可用流量 (bytes)
-  transferLimit: bigint('transfer_limit', { mode: 'bigint' }).default(1073741824n), // 旧版带宽限额 (bytes)
+  transferLimit: bigint('transfer_limit', { mode: 'bigint' }).default(sql`1073741824`), // 旧版带宽限额 (bytes)
   port: int('port').notNull(), // 连接端口
   switch: tinyint('switch').default(1).notNull(), // 用户连接开关
   enable: tinyint('enable').default(1).notNull(), // 账户可用开关
@@ -35,7 +36,7 @@ export const userTable = mysqlTable('user', {
   isAdmin: int('is_admin').default(0).notNull(), // 管理员标志
   imType: int('im_type').default(1),
   imValue: varchar('im_value', { length: 255 }),
-  lastDayT: bigint('last_day_t', { mode: 'bigint' }).default(0n).notNull(),
+  lastDayT: bigint('last_day_t', { mode: 'bigint' }).default(sql`0`).notNull(),
   isEdu: varchar('is_edu', { length: 64 }).default('0'),
   sendDailyMail: int('sendDailyMail').default(0).notNull(),
   class: int('class').default(0).notNull(), // 会员等级

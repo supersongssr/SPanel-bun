@@ -1,4 +1,5 @@
 import { mysqlTable, serial, int, varchar, bigint, decimal, tinyint, text } from 'drizzle-orm/mysql-core';
+import { sql } from 'drizzle-orm';
 
 // 边缘物理节点表
 export const nodeTable = mysqlTable('ss_node', {
@@ -15,7 +16,7 @@ export const nodeTable = mysqlTable('ss_node', {
   nodeSpeedlimit: decimal('node_speedlimit', { precision: 12, scale: 2 }).default('0.00').notNull(),
   nodeConnector: int('node_connector').default(0).notNull(),
   nodeBandwidth: decimal('node_bandwidth', { precision: 12, scale: 2 }).default('0.00').notNull(),
-  nodeHeartbeat: bigint('node_heartbeat', { mode: 'bigint' }).default(0n).notNull(),
+  nodeHeartbeat: bigint('node_heartbeat', { mode: 'bigint' }).default(sql`0`).notNull(),
   nodeIp: varchar('node_ip', { length: 255 }),
   nodeGroup: int('node_group').default(0).notNull(),
   customRss: int('custom_rss').default(0).notNull(),
@@ -28,12 +29,12 @@ export const nodeTable = mysqlTable('ss_node', {
   nodeSort: int('node_sort').default(0),
   cncdn: tinyint('cncdn'),
   isClone: int('is_clone').default(0),
-  trafficUsed: bigint('traffic_used', { mode: 'bigint' }).default(0n),
-  trafficLeft: bigint('traffic_left', { mode: 'bigint' }).default(0n),
-  trafficUsedDaily: bigint('traffic_used_daily', { mode: 'bigint' }).default(0n),
-  trafficLeftDaily: bigint('traffic_left_daily', { mode: 'bigint' }).default(0n),
-  trafficLimit: bigint('traffic_limit', { mode: 'bigint' }).default(0n).notNull(),
-  trafficRawTotal: bigint('traffic_raw_total', { mode: 'bigint' }).default(0n).notNull(),
+  trafficUsed: bigint('traffic_used', { mode: 'bigint' }).default(sql`0`),
+  trafficLeft: bigint('traffic_left', { mode: 'bigint' }).default(sql`0`),
+  trafficUsedDaily: bigint('traffic_used_daily', { mode: 'bigint' }).default(sql`0`),
+  trafficLeftDaily: bigint('traffic_left_daily', { mode: 'bigint' }).default(sql`0`),
+  trafficLimit: bigint('traffic_limit', { mode: 'bigint' }).default(sql`0`).notNull(),
+  trafficRawTotal: bigint('traffic_raw_total', { mode: 'bigint' }).default(sql`0`).notNull(),
   nodeIds: text('node_ids'),
   nodeUnlock: varchar('node_unlock', { length: 500 }).default(''),
   countryCode: varchar('country_code', { length: 32 }).default(''),
