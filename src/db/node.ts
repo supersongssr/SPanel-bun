@@ -19,6 +19,7 @@ export const nodeTable = mysqlTable('ss_node', {
   nodeHeartbeat: bigint('node_heartbeat', { mode: 'bigint' }).default(sql`0`).notNull(),
   nodeIp: varchar('node_ip', { length: 255 }),
   nodeGroup: int('node_group').default(0).notNull(),
+  nodeClass: int('node_class').default(0).notNull(),
   customRss: int('custom_rss').default(0).notNull(),
   muOnly: int('mu_only').default(0),
   nodeRxtx: varchar('node_rxtx', { length: 10 }).default('tx').notNull(), // 'rx', 'tx', 'rxtx'

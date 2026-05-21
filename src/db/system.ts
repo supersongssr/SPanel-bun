@@ -82,3 +82,18 @@ export const autoTable = mysqlTable('auto', {
   sign: text('sign').notNull(),
   datetime: bigint('datetime', { mode: 'bigint' }).notNull(),
 });
+
+// 订阅 Token 映射表
+export const linkTable = mysqlTable('link', {
+  id: serial('id').primaryKey(),
+  type: int('type').notNull(),
+  address: text('address').notNull(),
+  port: int('port').notNull(),
+  token: text('token').notNull(),
+  ios: int('ios').default(0).notNull(),
+  userId: bigint('userid', { mode: 'bigint' }).notNull(),
+  isp: text('isp'),
+  geo: int('geo'),
+  method: text('method'),
+});
+
