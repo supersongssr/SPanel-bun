@@ -37,4 +37,35 @@ program
     }
   });
 
+program
+  .command('checkjob')
+  .description('Flushes and aggregates Redis traffic logs into MySQL database')
+  .action(async () => {
+    try {
+      await loadConfig();
+      const { runCheckJob } = await import('./commands/checkjob');
+      await runCheckJob();
+      process.exit(0);
+    } catch (err: any) {
+      console.error('❌ Failed to run checkjob:', err.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('dailyjob')
+  .description('Clears expired classes/accounts and resets monthly traffic')
+  .action(async () => {
+    try {
+      await loadConfig();
+      const { runDailyJob } = await import('./commands/dailyjob');
+      await runDailyJob();
+      process.exit(0);
+    } catch (err: any) {
+      console.error('❌ Failed to run dailyjob:', err.message);
+      process.exit(1);
+    }
+  });
+
 program.parse(process.argv);
+
