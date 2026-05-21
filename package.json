@@ -1,0 +1,33 @@
+{
+  "name": "spanel-bun",
+  "version": "1.0.0",
+  "description": "Premium VPN & Proxy Management Panel built with Bun + ElysiaJS + Drizzle ORM",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "start": "bun src/index.ts",
+    "scheduler": "bun src/scheduler.ts",
+    "cli": "bun src/cli.ts",
+    "db:generate": "drizzle-kit generate:mysql",
+    "db:push": "drizzle-kit push:mysql"
+  },
+  "dependencies": {
+    "@elysiajs/cors": "^1.0.2",
+    "@elysiajs/swagger": "^1.0.5",
+    "commander": "^12.1.0",
+    "decimal.js": "^10.4.3",
+    "drizzle-orm": "^0.30.10",
+    "elysia": "^1.0.19",
+    "ioredis": "^5.4.1",
+    "jose": "^5.3.0",
+    "mysql2": "^3.9.8",
+    "node-cron": "^3.0.3",
+    "svg-captcha": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "@types/node-cron": "^3.0.11",
+    "drizzle-kit": "^0.21.4",
+    "typescript": "^5.4.5"
+  }
+}
