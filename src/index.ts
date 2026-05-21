@@ -8,6 +8,7 @@ import { authController } from './controllers/auth';
 import { subscriptionController } from './controllers/subscription';
 import { userController } from './controllers/user';
 import { muController } from './controllers/mu';
+import { adminController } from './controllers/admin';
 
 
 
@@ -86,6 +87,7 @@ const app = new Elysia()
   .use(subscriptionController)
   .use(userController)
   .use(muController)
+  .use(adminController)
 
   // 7. 系统运行健康检查端点 (Web Entry Health Check)
   .get('/api/health', () => {
