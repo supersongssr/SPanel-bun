@@ -7,6 +7,8 @@ import { authDerive } from './middleware/auth';
 import { authController } from './controllers/auth';
 import { subscriptionController } from './controllers/subscription';
 import { userController } from './controllers/user';
+import { muController } from './controllers/mu';
+
 
 
 // 启动前数据库与动态配置预载入
@@ -83,6 +85,7 @@ const app = new Elysia()
   .use(authController)
   .use(subscriptionController)
   .use(userController)
+  .use(muController)
 
   // 7. 系统运行健康检查端点 (Web Entry Health Check)
   .get('/api/health', () => {
