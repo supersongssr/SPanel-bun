@@ -4,6 +4,7 @@ import { swagger } from '@elysiajs/swagger';
 import { loadConfig } from './config/app';
 import { ipDerive, ipBlockGuard } from './middleware/ip';
 import { authDerive } from './middleware/auth';
+import { authController } from './controllers/auth';
 
 // 启动前数据库与动态配置预载入
 await loadConfig();
@@ -75,7 +76,10 @@ const app = new Elysia()
     };
   })
 
-  // 6. 系统运行健康检查端点 (Web Entry Health Check)
+  // 6. 挂载游客与鉴权控制器接口
+  .use(authController)
+
+  // 7. 系统运行健康检查端点 (Web Entry Health Check)
   .get('/api/health', () => {
     return {
       status: 'success',
