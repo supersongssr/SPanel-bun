@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>工单服务中心 - SPanel</title>
+  <script src="/assets/js/auth-guard.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            outfit: ['Outfit', 'sans-serif'],
+            inter: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body class="h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black text-slate-100 flex flex-col" x-data="adminTicketsPage()">
+  
+  <!-- 顶部导航栏 -->
+  <nav class="border-b border-slate-800 bg-slate-950/85 backdrop-blur-md sticky top-0 z-50 flex-shrink-0">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <span class="font-outfit text-2xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">SPanel</span>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 font-semibold border border-purple-500/20">Admin</span>
+        </div>
+        <div class="flex items-center space-x-5 text-sm overflow-x-auto py-2 custom-scrollbar">
+          <a href="/admin/dashboard.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-chart-pie mr-1.5"></i>监控</a>
+          <a href="/admin/users.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-user-gear mr-1.5"></i>会员</a>
+          <a href="/admin/nodes.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-server mr-1.5"></i>节点</a>
+          <a href="/admin/shops.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-bag-shopping mr-1.5"></i>商品</a>
+          <a href="/admin/tickets.html" class="text-purple-400 hover:text-purple-300 transition font-medium whitespace-nowrap"><i class="fa-solid fa-envelope-open-text mr-1.5"></i>工单</a>
+          <a href="/admin/announcements.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-bullhorn mr-1.5"></i>公告</a>
+          <a href="/admin/coupons.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-ticket mr-1.5"></i>优惠券</a>
+          <a href="/admin/codes.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-barcode mr-1.5"></i>卡密</a>
+          <a href="/admin/invites.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-users mr-1.5"></i>推广</a>
+          <a href="/admin/audits.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-shield-halved mr-1.5"></i>审计</a>
+          <button @click="logout" class="text-rose-400 hover:text-rose-300 transition font-medium whitespace-nowrap"><i class="fa-solid fa-right-from-bracket mr-1.5"></i>退出</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主体双栏内容 -->
+  <div class="flex-1 flex overflow-hidden max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
+    
+    <!-- 左侧工单列表栏 -->
+    <div class="w-80 flex flex-col glass-card rounded-3xl overflow-hidden flex-shrink-0">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/10">
+        <h3 class="font-bold text-white font-outfit">工单列表</h3>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-semibold" x-text="filteredTickets().length">0</span>
+      </div>
+
+      <!-- 状态过滤开关 -->
+      <div class="p-3 border-b border-slate-850 flex space-x-2">
+        <button @click="filterStatus = 'all'" class="flex-1 text-[11px] font-semibold py-1 rounded-lg transition" :class="filterStatus === 'all' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-slate-200'">全部</button>
+        <button @click="filterStatus = 'open'" class="flex-1 text-[11px] font-semibold py-1 rounded-lg transition" :class="filterStatus === 'open' ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-500/10' : 'text-slate-400 hover:text-slate-200'">待处理</button>
+        <button @click="filterStatus = 'closed'" class="flex-1 text-[11px] font-semibold py-1 rounded-lg transition" :class="filterStatus === 'closed' ? 'bg-rose-950/20 text-rose-400 border border-rose-550/10' : 'text-slate-400 hover:text-slate-200'">已结单</button>
+      </div>
+
+      <!-- 列表滑动滚动 -->
+      <div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2">
+        <template x-for="tkt in filteredTickets()" :key="tkt.id">
+          <div @click="selectTicket(tkt.id)" 
+               class="p-4 rounded-2xl cursor-pointer border transition duration-200"
+               :class="activeTicketId === tkt.id ? 'bg-purple-950/25 border-purple-500/40 shadow-inner' : 'bg-slate-900/20 border-slate-800 hover:border-slate-700'">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-mono text-slate-500" x-text="'#' + tkt.id"></span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase"
+                    :class="tkt.status === 'open' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'"
+                    x-text="tkt.status === 'open' ? '待处理' : '已关闭'"></span>
+            </div>
+            <h4 class="text-sm font-semibold text-slate-100 truncate mb-1" x-text="tkt.title"></h4>
+            <div class="text-[11px] text-slate-400 flex justify-between">
+              <span class="truncate max-w-[100px]" x-text="tkt.user.userName"></span>
+              <span x-text="tkt.datetime.substring(5, 16)"></span>
+            </div>
+          </div>
+        </template>
+        <div class="text-center text-xs text-slate-500 py-12" x-show="filteredTickets().length === 0">暂无符合条件的工单记录</div>
+      </div>
+    </div>
+
+    <!-- 右侧会话互动中心 -->
+    <div class="flex-1 flex flex-col glass-card rounded-3xl overflow-hidden">
+      
+      <!-- 右侧顶部头部 -->
+      <div class="p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/10" x-show="activeTicketId">
+        <div>
+          <h3 class="text-lg font-bold text-white font-outfit" x-text="activeTicket.title">加载中...</h3>
+          <p class="text-xs text-slate-400 mt-1" x-show="activeTicket.user">
+            发起人：<span class="text-purple-400" x-text="activeTicket.user.userName"></span> (<span class="font-mono text-slate-500" x-text="activeTicket.user.email"></span>)
+          </p>
+        </div>
+        <div class="flex space-x-2" x-show="activeTicket.status === 'open'">
+          <button @click="closeActiveTicket()" class="bg-rose-950/40 hover:bg-rose-950/60 border border-rose-500/20 hover:border-rose-500/40 text-rose-400 text-xs px-4 py-2 rounded-xl font-medium transition"><i class="fa-solid fa-lock mr-1.5"></i>结单关闭</button>
+        </div>
+      </div>
+
+      <!-- 聊天内容流 -->
+      <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6" x-ref="chatContainer" x-show="activeTicketId">
+        <template x-for="chat in activeTicket.chat_flow" :key="chat.id">
+          <div class="flex flex-col" :class="chat.role === 'support' ? 'items-end' : 'items-start'">
+            <div class="flex items-center space-x-2 mb-1.5">
+              <span class="text-xs font-semibold" :class="chat.role === 'support' ? 'text-indigo-400 order-last ml-2' : 'text-purple-400'" x-text="chat.sender"></span>
+              <span class="text-[10px] text-slate-500" x-text="chat.datetime"></span>
+            </div>
+            <div class="max-w-[75%] rounded-2xl p-4 text-sm leading-relaxed" 
+                 :class="chat.role === 'support' ? 'bg-gradient-to-br from-indigo-900/40 to-slate-900/80 border border-indigo-500/20 text-indigo-100 rounded-tr-none' : 'bg-slate-900/60 border border-slate-800 text-slate-200 rounded-tl-none'"
+                 x-text="chat.content"></div>
+          </div>
+        </template>
+      </div>
+
+      <!-- 客服回复区域 -->
+      <div class="p-6 border-t border-slate-800 bg-slate-950/30 flex-shrink-0" x-show="activeTicketId && activeTicket.status === 'open'">
+        <form @submit.prevent="submitReply">
+          <div class="flex items-start space-x-4">
+            <div class="flex-grow">
+              <textarea x-model="replyContent" required rows="3" class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition resize-none custom-scrollbar" placeholder="请输入对会员工单的追加解答与支持内容..."></textarea>
+            </div>
+            <button type="submit" class="bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white w-12 h-12 flex items-center justify-center rounded-2xl transition shadow-lg shadow-purple-600/20 flex-shrink-0"><i class="fa-solid fa-paper-plane text-base"></i></button>
+          </div>
+        </form>
+      </div>
+
+      <!-- 未选择工单时的空面板 -->
+      <div class="flex-1 flex flex-col items-center justify-center text-center p-12" x-show="!activeTicketId">
+        <i class="fa-solid fa-comments-dollar text-5xl text-slate-700 mb-4"></i>
+        <h3 class="text-base font-semibold text-slate-300">工单会话互动大厅</h3>
+        <p class="text-xs text-slate-500 max-w-sm mt-2 leading-relaxed">请在左侧列表中点击选择任意一条客服工单，查看完整的会话回复日志并快速进行结单或答复互动。</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="/assets/js/api.js"></script>
+  <script>
+    function adminTicketsPage() {
+      return {
+        tickets: [],
+        filterStatus: 'all',
+        activeTicketId: null,
+        activeTicket: {
+          title: '',
+          status: 'open',
+          chat_flow: [],
+          user: null
+        },
+        replyContent: '',
+
+        async init() {
+          await this.fetchTickets();
+        },
+
+        async fetchTickets() {
+          try {
+            const res = await SPanelAPI.request('/admin/ticket');
+            this.tickets = res.data;
+          } catch (err) {
+            alert('获取工单列表失败: ' + err.message);
+          }
+        },
+
+        filteredTickets() {
+          if (this.filterStatus === 'all') return this.tickets;
+          return this.tickets.filter(t => t.status === this.filterStatus);
+        },
+
+        async selectTicket(id) {
+          this.activeTicketId = id;
+          this.replyContent = '';
+          try {
+            const res = await SPanelAPI.request(`/admin/ticket/${id}`);
+            const data = res.data;
+            
+            // 找出此工单的发起者信息，填充头部
+            const meta = this.tickets.find(t => t.id === id);
+            this.activeTicket = {
+              title: data.title,
+              status: data.status,
+              chat_flow: data.chat_flow,
+              user: meta ? meta.user : null
+            };
+
+            // 滚动聊天到底部
+            this.$nextTick(() => {
+              const el = this.$refs.chatContainer;
+              if (el) el.scrollTop = el.scrollHeight;
+            });
+          } catch (err) {
+            alert('读取工单详情失败: ' + err.message);
+          }
+        },
+
+        async submitReply() {
+          if (!this.replyContent.trim()) return;
+          try {
+            await SPanelAPI.request(`/admin/ticket/${this.activeTicketId}`, {
+              method: 'PUT',
+              body: JSON.stringify({ content: this.replyContent })
+            });
+            this.replyContent = '';
+            await this.selectTicket(this.activeTicketId);
+            await this.fetchTickets(); // 刷新左侧列表状态
+          } catch (err) {
+            alert('回复失败: ' + err.message);
+          }
+        },
+
+        async closeActiveTicket() {
+          if (!confirm('您确定要结单并关闭此工单吗？')) return;
+          try {
+            await SPanelAPI.request(`/admin/ticket/${this.activeTicketId}`, {
+              method: 'DELETE'
+            });
+            await this.selectTicket(this.activeTicketId);
+            await this.fetchTickets();
+          } catch (err) {
+            alert('关闭工单失败: ' + err.message);
+          }
+        },
+
+        logout() {
+          localStorage.removeItem('spanel_jwt');
+          localStorage.removeItem('spanel_user');
+          window.location.replace('/auth/login.html');
+        }
+      }
+    }
+  </script>
+</body>
+</html>

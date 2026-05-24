@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统公告管理 - SPanel</title>
+  <script src="/assets/js/auth-guard.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Marked Markdown Parser CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            outfit: ['Outfit', 'sans-serif'],
+            inter: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .prose h1 { font-size: 1.5rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: #fff; }
+    .prose h2 { font-size: 1.25rem; font-weight: 600; margin-top: 0.8rem; margin-bottom: 0.4rem; color: #f1f5f9; }
+    .prose h3 { font-size: 1.1rem; font-weight: 600; margin-top: 0.6rem; margin-bottom: 0.3rem; color: #e2e8f0; }
+    .prose p { margin-bottom: 0.8rem; color: #cbd5e1; line-height: 1.6; }
+    .prose blockquote { border-left: 3px solid #818cf8; padding-left: 1rem; color: #94a3b8; font-style: italic; margin-bottom: 0.8rem; }
+    .prose ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 0.8rem; }
+    .prose li { margin-bottom: 0.25rem; color: #cbd5e1; }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body class="min-h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black text-slate-100 pb-12" x-data="adminAnnouncementsPage()">
+  
+  <!-- 顶部导航栏 -->
+  <nav class="border-b border-slate-800 bg-slate-950/85 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <span class="font-outfit text-2xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">SPanel</span>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 font-semibold border border-purple-500/20">Admin</span>
+        </div>
+        <div class="flex items-center space-x-5 text-sm overflow-x-auto py-2 custom-scrollbar">
+          <a href="/admin/dashboard.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-chart-pie mr-1.5"></i>监控</a>
+          <a href="/admin/users.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-user-gear mr-1.5"></i>会员</a>
+          <a href="/admin/nodes.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-server mr-1.5"></i>节点</a>
+          <a href="/admin/shops.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-bag-shopping mr-1.5"></i>商品</a>
+          <a href="/admin/tickets.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-envelope-open-text mr-1.5"></i>工单</a>
+          <a href="/admin/announcements.html" class="text-purple-400 hover:text-purple-300 transition font-medium whitespace-nowrap"><i class="fa-solid fa-bullhorn mr-1.5"></i>公告</a>
+          <a href="/admin/coupons.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-ticket mr-1.5"></i>优惠券</a>
+          <a href="/admin/codes.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-barcode mr-1.5"></i>卡密</a>
+          <a href="/admin/invites.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-users mr-1.5"></i>推广</a>
+          <a href="/admin/audits.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-shield-halved mr-1.5"></i>审计</a>
+          <button @click="logout" class="text-rose-400 hover:text-rose-300 transition font-medium whitespace-nowrap"><i class="fa-solid fa-right-from-bracket mr-1.5"></i>退出</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主体内容 -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="text-2xl font-semibold font-outfit text-white">系统公告发布管理</h2>
+        <p class="text-slate-400 text-sm mt-1">支持全站公告的高阶 Markdown 格式化排版编辑，并实时进行动态分发推送。</p>
+      </div>
+      <button @click="openCreateModal()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-lg shadow-purple-600/25"><i class="fa-solid fa-plus mr-1.5"></i>新建发布公告</button>
+    </div>
+
+    <!-- 公告时间流列表 -->
+    <div class="space-y-6" x-show="announcements.length > 0">
+      <template x-for="ann in announcements" :key="ann.id">
+        <div class="glass-card rounded-3xl p-6 relative hover:border-slate-700/60 transition">
+          
+          <!-- 动作控制 -->
+          <div class="absolute top-6 right-6 flex space-x-2">
+            <button @click="openEditModal(ann)" class="text-slate-500 hover:text-purple-400 text-xs px-2.5 py-1 bg-slate-900 border border-slate-800 rounded-lg transition"><i class="fa-solid fa-pen mr-1"></i>编辑</button>
+            <button @click="deleteAnnouncement(ann.id)" class="text-slate-500 hover:text-rose-400 text-xs px-2.5 py-1 bg-slate-900 border border-slate-800 rounded-lg transition"><i class="fa-solid fa-trash"></i></button>
+          </div>
+
+          <div class="flex items-center space-x-2.5 mb-4 text-xs font-semibold text-indigo-400">
+            <i class="fa-regular fa-calendar"></i>
+            <span x-text="ann.date"></span>
+          </div>
+
+          <!-- HTML 预览区 -->
+          <div class="prose max-w-none text-slate-300" x-html="ann.content"></div>
+        </div>
+      </template>
+    </div>
+
+    <div class="glass-card rounded-2xl p-12 text-center" x-show="announcements.length === 0">
+      <i class="fa-solid fa-bullhorn text-4xl text-slate-600 mb-4 block"></i>
+      <span class="text-slate-400 text-sm">当前未发布任何系统通知公告。</span>
+    </div>
+
+    <!-- MODAL: Markdown 编辑器 -->
+    <div x-show="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in" x-cloak>
+      <div class="glass-card rounded-3xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden shadow-2xl border border-slate-800" @click.away="modalOpen = false">
+        
+        <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/25 flex-shrink-0">
+          <h3 class="text-lg font-bold text-white font-outfit" x-text="editMode ? '编辑系统公告' : '新建发布系统公告'"></h3>
+          <button @click="modalOpen = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <!-- 左右分栏：左侧输入 Markdown，右侧实时预览 HTML -->
+        <div class="flex-1 flex overflow-hidden">
+          <!-- 左侧编辑区 -->
+          <div class="w-1/2 flex flex-col border-r border-slate-850 p-4">
+            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">公告 Markdown 原始内容</label>
+            <textarea x-model="markdownText" @input="updatePreview" class="flex-grow w-full bg-slate-900/60 border border-slate-800 rounded-2xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition resize-none custom-scrollbar font-mono leading-relaxed" placeholder="请输入公告的 Markdown 格式文本，支持 # 标题、**粗体**、- 列表等排版..."></textarea>
+          </div>
+          <!-- 右侧预览区 -->
+          <div class="w-1/2 flex flex-col p-4 overflow-y-auto custom-scrollbar">
+            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">全站 HTML 实时渲染预览效果</label>
+            <div class="prose max-w-none flex-grow bg-slate-950/40 border border-slate-850 rounded-2xl p-4 overflow-y-auto custom-scrollbar" x-html="htmlPreview"></div>
+          </div>
+        </div>
+
+        <div class="p-6 border-t border-slate-850 bg-slate-900/10 flex justify-end space-x-3 flex-shrink-0">
+          <button type="button" @click="modalOpen = false" class="bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-850 px-5 py-2.5 rounded-xl text-sm font-medium transition">取消</button>
+          <button type="button" @click="publishAnnouncement" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-lg shadow-purple-600/20" x-text="editMode ? '保存更新' : '立即发布公告'"></button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script src="/assets/js/api.js"></script>
+  <script>
+    function adminAnnouncementsPage() {
+      return {
+        announcements: [],
+        
+        // Editor States
+        modalOpen: false,
+        editMode: false,
+        activeAnnId: null,
+        markdownText: '',
+        htmlPreview: '',
+
+        async init() {
+          await this.fetchAnnouncements();
+        },
+
+        async fetchAnnouncements() {
+          try {
+            const res = await SPanelAPI.request('/admin/announcement');
+            this.announcements = res.data;
+          } catch (err) {
+            alert('读取公告列表失败: ' + err.message);
+          }
+        },
+
+        openCreateModal() {
+          this.editMode = false;
+          this.activeAnnId = null;
+          this.markdownText = '';
+          this.htmlPreview = '';
+          this.modalOpen = true;
+        },
+
+        openEditModal(ann) {
+          this.editMode = true;
+          this.activeAnnId = ann.id;
+          this.markdownText = ann.markdown;
+          this.updatePreview();
+          this.modalOpen = true;
+        },
+
+        updatePreview() {
+          if (typeof marked !== 'undefined') {
+            this.htmlPreview = marked.parse(this.markdownText);
+          } else {
+            this.htmlPreview = '<p class="text-slate-500 text-xs">Markdown 解析器加载中...</p>';
+          }
+        },
+
+        async publishAnnouncement() {
+          if (!this.markdownText.trim()) {
+            alert('公告内容不能为空！');
+            return;
+          }
+          // 在提交前确保生成了 HTML 渲染值
+          this.updatePreview();
+
+          try {
+            if (this.editMode) {
+              await SPanelAPI.request(`/admin/announcement/${this.activeAnnId}`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                  markdown: this.markdownText,
+                  content: this.htmlPreview
+                })
+              });
+            } else {
+              await SPanelAPI.request('/admin/announcement', {
+                method: 'POST',
+                body: JSON.stringify({
+                  markdown: this.markdownText,
+                  content: this.htmlPreview
+                })
+              });
+            }
+            this.modalOpen = false;
+            await this.fetchAnnouncements();
+          } catch (err) {
+            alert('发布失败: ' + err.message);
+          }
+        },
+
+        async deleteAnnouncement(id) {
+          if (!confirm('您确认要永久物理删除该条公告通知吗？')) return;
+          try {
+            await SPanelAPI.request(`/admin/announcement/${id}`, { method: 'DELETE' });
+            await this.fetchAnnouncements();
+          } catch (err) {
+            alert('删除公告失败: ' + err.message);
+          }
+        },
+
+        logout() {
+          localStorage.removeItem('spanel_jwt');
+          localStorage.removeItem('spanel_user');
+          window.location.replace('/auth/login.html');
+        }
+      }
+    }
+  </script>
+</body>
+</html>

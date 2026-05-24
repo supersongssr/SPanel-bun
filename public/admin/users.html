@@ -41,11 +41,18 @@
           <span class="font-outfit text-2xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">SPanel</span>
           <span class="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 font-semibold border border-purple-500/20">Admin</span>
         </div>
-        <div class="flex items-center space-x-6 text-sm">
-          <a href="/admin/dashboard.html" class="text-slate-400 hover:text-purple-400 transition font-medium"><i class="fa-solid fa-chart-pie mr-1.5"></i>全局监控</a>
-          <a href="/admin/users.html" class="text-purple-400 hover:text-purple-300 transition font-medium"><i class="fa-solid fa-user-gear mr-1.5"></i>会员管理</a>
-          <a href="/admin/nodes.html" class="text-slate-400 hover:text-purple-400 transition font-medium"><i class="fa-solid fa-server mr-1.5"></i>节点调度</a>
-          <button @click="logout" class="text-rose-400 hover:text-rose-300 transition font-medium"><i class="fa-solid fa-right-from-bracket mr-1.5"></i>退出</button>
+        <div class="flex items-center space-x-5 text-sm overflow-x-auto py-2 custom-scrollbar">
+          <a href="/admin/dashboard.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-chart-pie mr-1.5"></i>监控</a>
+          <a href="/admin/users.html" class="text-purple-400 hover:text-purple-300 transition font-medium whitespace-nowrap"><i class="fa-solid fa-user-gear mr-1.5"></i>会员</a>
+          <a href="/admin/nodes.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-server mr-1.5"></i>节点</a>
+          <a href="/admin/shops.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-bag-shopping mr-1.5"></i>商品</a>
+          <a href="/admin/tickets.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-envelope-open-text mr-1.5"></i>工单</a>
+          <a href="/admin/announcements.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-bullhorn mr-1.5"></i>公告</a>
+          <a href="/admin/coupons.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-ticket mr-1.5"></i>优惠券</a>
+          <a href="/admin/codes.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-barcode mr-1.5"></i>卡密</a>
+          <a href="/admin/invites.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-users mr-1.5"></i>推广</a>
+          <a href="/admin/audits.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-shield-halved mr-1.5"></i>审计</a>
+          <button @click="logout" class="text-rose-400 hover:text-rose-300 transition font-medium whitespace-nowrap"><i class="fa-solid fa-right-from-bracket mr-1.5"></i>退出</button>
         </div>
       </div>
     </div>
