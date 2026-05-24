@@ -2,10 +2,38 @@
 // Synchronously blocks unauthorized rendering to guarantee zero content jitter (flickering).
 
 (function () {
-  const token = localStorage.getItem('spanel_jwt');
-  const userStr = localStorage.getItem('spanel_user');
-  let user = null;
+  function isJwtExpired(token) {
+    if (!token) return true;
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return true;
+      // Base64URL to Base64 decode
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      const payload = JSON.parse(jsonPayload);
+      if (payload.exp && Date.now() >= payload.exp * 1000) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  let token = localStorage.getItem('spanel_jwt');
+  let userStr = localStorage.getItem('spanel_user');
   
+  if (isJwtExpired(token)) {
+    localStorage.removeItem('spanel_jwt');
+    localStorage.removeItem('spanel_user');
+    token = null;
+    userStr = null;
+  }
+
+  let user = null;
   try {
     user = userStr ? JSON.parse(userStr) : null;
   } catch (e) {
