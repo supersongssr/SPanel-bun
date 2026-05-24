@@ -3,12 +3,23 @@ import svgCaptcha from 'svg-captcha';
 import { redis } from '../../config/redis';
 import { randomUUID } from 'crypto';
 import { handlePowRequest, handleLogin, handleSendCode, handleRegister } from './authService';
+import { getConfig } from '../../config/app';
 
 export const authController = new Elysia({ prefix: '/api/v1/auth' })
   /**
-   * 1. 获取图形验证码 (用于人机校验防止恶意批量请求算力盐)
+   * 1. 获取图形/极验验证码配置 (用于人机校验防止恶意批量请求算力盐)
    */
   .get('/captcha', async () => {
+    const provider = getConfig('captcha_provider', 'graphic');
+
+    if (provider === 'geetest') {
+      return {
+        status: 'success',
+        captcha_provider: 'geetest',
+        geetest_id: getConfig('geetest_id'),
+      };
+    }
+
     const captcha = svgCaptcha.create({
       size: 4,
       ignoreChars: '0o1i',
@@ -23,6 +34,7 @@ export const authController = new Elysia({ prefix: '/api/v1/auth' })
     
     return {
       status: 'success',
+      captcha_provider: 'graphic',
       captchaId,
       svg: captcha.data,
     };
@@ -32,11 +44,17 @@ export const authController = new Elysia({ prefix: '/api/v1/auth' })
    * 2. 请求工作量挑战 (POW Challenge)
    */
   .post('/pow-challenge', async ({ body }) => {
-    return await handlePowRequest(body.captchaId, body.captchaCode);
+    return await handlePowRequest(body);
   }, {
     body: t.Object({
-      captchaId: t.String(),
-      captchaCode: t.String(),
+      captchaId: t.Optional(t.String()),
+      captchaCode: t.Optional(t.String()),
+      geetestParams: t.Optional(t.Object({
+        lot_number: t.String(),
+        captcha_output: t.String(),
+        pass_token: t.String(),
+        gen_time: t.String(),
+      }))
     }),
   })
 
@@ -79,5 +97,9 @@ export const authController = new Elysia({ prefix: '/api/v1/auth' })
       emailCode: t.String(),
       powSalt: t.String(),
       powNonce: t.String(),
+      userName: t.Optional(t.String()),
+      imType: t.Optional(t.Union([t.String(), t.Number()])),
+      imValue: t.Optional(t.String()),
+      code: t.Optional(t.String()),
     }),
   });

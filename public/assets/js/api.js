@@ -56,13 +56,23 @@
     },
 
     /**
-     * 自动从后端拉取 POW 挑战，并在 Web Worker 后台计算出 Nonce
+     * 自动从后端拉取 POW 挑战，并在 Web Worker 后台计算出 Nonce (支持图形验证码和极验)
      */
-    async getPowChallengeAndSolve(captchaId, captchaCode) {
-      // 1. 发起图形验证码校验并拉取 POW Salt 挑战
+    async getPowChallengeAndSolve(captchaIdOrParams, captchaCode) {
+      let bodyData = {};
+      if (typeof captchaIdOrParams === 'object' && captchaIdOrParams !== null) {
+        bodyData = captchaIdOrParams;
+      } else {
+        bodyData = {
+          captchaId: captchaIdOrParams,
+          captchaCode: captchaCode,
+        };
+      }
+
+      // 1. 发起验证并拉取 POW Salt 挑战
       const challengeResponse = await this.request('/auth/pow-challenge', {
         method: 'POST',
-        body: JSON.stringify({ captchaId, captchaCode }),
+        body: JSON.stringify(bodyData),
       });
 
       const { powSalt, difficulty } = challengeResponse.data;

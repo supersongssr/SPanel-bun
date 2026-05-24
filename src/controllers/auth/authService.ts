@@ -6,34 +6,51 @@ import { checkPassword, passwordHash } from '../../utils/hash';
 import { signToken } from '../../middleware/auth';
 import { verifyPow } from '../../middleware/pow';
 import { randomBytes, randomUUID } from 'crypto';
+import { getConfig } from '../../config/app';
+import { verifyGeetest } from '../../utils/geetest';
 
 /**
- * 校验图形验证码并分发算力挑战 (POW Challenge)
+ * 校验图形验证码或极验验证码并分发算力挑战 (POW Challenge)
  */
-export async function handlePowRequest(captchaId: string, captchaCode: string) {
-  if (!captchaId || !captchaCode) {
-    throw new Error('图形验证码校验失败：参数不全。');
-  }
+export async function handlePowRequest(body: any) {
+  const provider = getConfig('captcha_provider', 'graphic');
 
-  const redisKey = `captcha:${captchaId}`;
-  const storedCode = await redis.get(redisKey);
-  
-  if (!storedCode || storedCode !== captchaCode.toLowerCase()) {
-    throw new Error('图形验证码有误或已过期，请重新获取。');
-  }
+  if (provider === 'geetest') {
+    const { lot_number, captcha_output, pass_token, gen_time } = body.geetestParams || {};
+    if (!lot_number || !captcha_output || !pass_token || !gen_time) {
+      throw new Error('极验人机验证校验失败：验证参数不全。');
+    }
+    const isValid = await verifyGeetest(lot_number, captcha_output, pass_token, gen_time);
+    if (!isValid) {
+      throw new Error('极验人机校验未通过，请重新进行滑块校验。');
+    }
+  } else {
+    const { captchaId, captchaCode } = body;
+    if (!captchaId || !captchaCode) {
+      throw new Error('图形验证码校验失败：参数不全。');
+    }
 
-  // 验证码验证成功即销毁，防刷
-  await redis.del(redisKey);
+    const redisKey = `captcha:${captchaId}`;
+    const storedCode = await redis.get(redisKey);
+    
+    if (!storedCode || storedCode !== captchaCode.toLowerCase()) {
+      throw new Error('图形验证码有误或已过期，请重新获取。');
+    }
+
+    // 验证码验证成功即销毁，防刷
+    await redis.del(redisKey);
+  }
 
   // 授权并下发 POW 算力挑战盐 (difficulty: 4)
   const salt = randomBytes(16).toString('hex');
+  const powDifficulty = Number(getConfig('pow_difficulty', '4'));
   await redis.set(`pow:salt:${salt}`, '1', 'EX', 300);
 
   return {
     status: 'success',
     data: {
       powSalt: salt,
-      difficulty: 4,
+      difficulty: powDifficulty,
     }
   };
 }
@@ -147,7 +164,7 @@ export async function handleSendCode(body: any) {
  * 核心用户注册逻辑
  */
 export async function handleRegister(body: any, set: any) {
-  const { email, password, emailCode, powSalt, powNonce } = body;
+  const { email, password, emailCode, powSalt, powNonce, userName: inputUserName, imType, imValue, code } = body;
 
   // 1. 验证 POW
   const isPowValid = await verifyPow(powSalt, powNonce);
@@ -196,7 +213,7 @@ export async function handleRegister(body: any, set: any) {
   }
 
   // 5. 生成高兼容的默认字段与加密散列
-  const userName = email.split('@')[0];
+  const finalUserName = inputUserName || email.split('@')[0];
   const passHash = passwordHash(password);
   const ssPasswd = randomBytes(6).toString('hex'); // Shadowsocks 密码
   const v2rayUuid = randomUUID(); // V2Ray 客户端 UUID
@@ -205,9 +222,21 @@ export async function handleRegister(body: any, set: any) {
   // 默认注册流量: 10GB = 10737418240 字节
   const defaultTraffic = 10737418240n;
 
+  // 邀请码验证
+  let refBy = 0;
+  if (code) {
+    const inviterId = Number(code);
+    if (!isNaN(inviterId) && inviterId > 0) {
+      const inviter = await db.select().from(userTable).where(eq(userTable.id, inviterId)).limit(1);
+      if (inviter.length > 0) {
+        refBy = inviter[0].id;
+      }
+    }
+  }
+
   // 6. 执行写入用户注册
   await db.insert(userTable).values({
-    userName,
+    userName: finalUserName,
     email,
     pass: passHash,
     passwd: ssPasswd,
@@ -219,6 +248,9 @@ export async function handleRegister(body: any, set: any) {
     money: '0.00',
     inviteNum: 0,
     regDate,
+    refBy,
+    imType: Number(imType || 1),
+    imValue: imValue || '',
   });
 
   return {

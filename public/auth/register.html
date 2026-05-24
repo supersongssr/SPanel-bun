@@ -10,7 +10,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <!-- Alpine.js -->
+  <!-- Alpine.js & Geetest v4 -->
+  <script src="https://static.geetest.com/v4/gt4.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <!-- Tailwind Config for Premium Theme -->
   <script>
@@ -65,6 +66,15 @@
           </div>
         </div>
 
+        <!-- 昵称 -->
+        <div>
+          <label class="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">个性昵称</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500"><i class="fa-solid fa-user-tag"></i></span>
+            <input type="text" x-model="userName" placeholder="如何称呼您（选填）" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-300">
+          </div>
+        </div>
+
         <!-- 密码 -->
         <div>
           <label class="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">登录密码</label>
@@ -74,18 +84,59 @@
           </div>
         </div>
 
-        <!-- 图形验证码 -->
+        <!-- 联络方式类型 -->
         <div>
-          <label class="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">图形验证码 (用于人机前置预检)</label>
+          <label class="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">选择联络工具</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500"><i class="fa-solid fa-comments"></i></span>
+            <select x-model="imType" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-300 appearance-none">
+              <option value="1" class="bg-slate-950 text-slate-100">WeChat (微信)</option>
+              <option value="2" class="bg-slate-950 text-slate-100">QQ</option>
+              <option value="3" class="bg-slate-950 text-slate-100">Facebook</option>
+              <option value="4" class="bg-slate-950 text-slate-100">Telegram</option>
+            </select>
+            <span class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 pointer-events-none"><i class="fa-solid fa-chevron-down text-xs"></i></span>
+          </div>
+        </div>
+
+        <!-- 联络方式账号 -->
+        <div>
+          <label class="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">联络工具账号</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500"><i class="fa-solid fa-address-card"></i></span>
+            <input type="text" required x-model="imValue" placeholder="请输入对应账号" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-300">
+          </div>
+        </div>
+
+        <!-- 邀请码 -->
+        <div>
+          <label class="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">邀请码</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500"><i class="fa-solid fa-ticket"></i></span>
+            <input type="text" x-model="code" placeholder="邀请码（选填/由链接自动读取）" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-300">
+          </div>
+        </div>
+
+        <!-- 图形验证码 (captchaProvider === 'graphic') -->
+        <div x-show="captchaProvider === 'graphic'">
+          <label class="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">图形验证码 (用于人机防爆破)</label>
           <div class="flex space-x-3">
             <div class="relative flex-1">
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500"><i class="fa-solid fa-shield-halved"></i></span>
-              <input type="text" required x-model="captchaCode" placeholder="图形验证码" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-300">
+              <input type="text" :required="captchaProvider === 'graphic'" x-model="captchaCode" placeholder="图形验证码" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-300">
             </div>
             <!-- 验证码 SVG 卡片 -->
             <div @click="refreshCaptcha" class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden cursor-pointer h-12 w-28 flex items-center justify-center transition hover:border-indigo-500" x-html="captchaSvg" title="点击刷新">
               <span class="text-slate-600 text-xs animate-pulse">加载中...</span>
             </div>
+          </div>
+        </div>
+
+        <!-- 极验验证码 (captchaProvider === 'geetest') -->
+        <div x-show="captchaProvider === 'geetest'" class="space-y-2">
+          <label class="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">人机安全校验</label>
+          <div id="geetest-captcha" class="w-full min-h-12 flex items-center justify-center bg-slate-950/80 border border-slate-800 rounded-xl overflow-hidden py-1">
+            <span class="text-slate-500 text-xs animate-pulse">正在载入极验安全组件...</span>
           </div>
         </div>
 
@@ -139,9 +190,17 @@
       return {
         email: '',
         password: '',
+        userName: '',
+        imType: '1',
+        imValue: '',
+        code: '',
         captchaCode: '',
         captchaId: '',
         captchaSvg: '',
+        captchaProvider: 'graphic',
+        geetestId: '',
+        geetestValidate: null,
+        geetestCaptchaObj: null,
         emailCode: '',
         loading: false,
         sending: false,
@@ -150,17 +209,67 @@
         timer: null,
 
         async init() {
-          this.refreshCaptcha();
+          const urlParams = new URLSearchParams(window.location.search);
+          this.code = urlParams.get('ref') || urlParams.get('code') || '';
+          await this.loadCaptcha();
+        },
+
+        async loadCaptcha() {
+          try {
+            const res = await SPanelAPI.request('/auth/captcha', { method: 'GET' });
+            this.captchaProvider = res.captcha_provider || 'graphic';
+            if (this.captchaProvider === 'geetest') {
+              this.geetestId = res.geetest_id;
+              this.$nextTick(() => {
+                this.initGeetest();
+              });
+            } else {
+              this.captchaId = res.captchaId;
+              this.captchaSvg = res.svg;
+              this.captchaCode = '';
+            }
+          } catch (err) {
+            console.error('拉取验证码配置失败:', err);
+          }
+        },
+
+        initGeetest() {
+          if (window.initGeetest4) {
+            window.initGeetest4({
+              captchaId: this.geetestId,
+              product: 'float',
+              onError: (err) => {
+                console.error('[Geetest] config.onError:', err);
+              }
+            }, (captchaObj) => {
+              const container = document.getElementById('geetest-captcha');
+              if (container) container.innerHTML = '';
+              captchaObj.appendTo('#geetest-captcha');
+              captchaObj.onSuccess(() => {
+                this.geetestValidate = captchaObj.getValidate();
+              });
+              this.geetestCaptchaObj = captchaObj;
+            });
+          } else {
+            console.error('[Geetest] initGeetest4 is not defined');
+          }
         },
 
         async refreshCaptcha() {
-          try {
-            const res = await SPanelAPI.request('/auth/captcha', { method: 'GET' });
-            this.captchaId = res.captchaId;
-            this.captchaSvg = res.svg;
-            this.captchaCode = '';
-          } catch (err) {
-            alert('图形验证码拉取失败，请检查网络。');
+          if (this.captchaProvider === 'geetest') {
+            if (this.geetestCaptchaObj) {
+              this.geetestCaptchaObj.reset();
+            }
+            this.geetestValidate = null;
+          } else {
+            try {
+              const res = await SPanelAPI.request('/auth/captcha', { method: 'GET' });
+              this.captchaId = res.captchaId;
+              this.captchaSvg = res.svg;
+              this.captchaCode = '';
+            } catch (err) {
+              alert('图形验证码拉取失败，请检查网络。');
+            }
           }
         },
 
@@ -172,7 +281,11 @@
             alert('请先输入您的电子邮箱。');
             return;
           }
-          if (!this.captchaCode) {
+          if (this.captchaProvider === 'geetest' && !this.geetestValidate) {
+            alert('请先完成极验安全滑块验证。');
+            return;
+          }
+          if (this.captchaProvider === 'graphic' && !this.captchaCode) {
             alert('请先填写图形验证码以完成人机防刷预检。');
             return;
           }
@@ -180,7 +293,14 @@
           this.sending = true;
           try {
             // 1. 发起算力挑战请求
-            const powResult = await SPanelAPI.getPowChallengeAndSolve(this.captchaId, this.captchaCode);
+            let powResult;
+            if (this.captchaProvider === 'geetest') {
+              powResult = await SPanelAPI.getPowChallengeAndSolve({
+                geetestParams: this.geetestValidate
+              });
+            } else {
+              powResult = await SPanelAPI.getPowChallengeAndSolve(this.captchaId, this.captchaCode);
+            }
 
             // 2. 将算力 Nonce 与邮箱一并提交发送接口
             await SPanelAPI.request('/auth/send-code', {
@@ -215,22 +335,40 @@
          * 提交最终的注册表单
          */
         async submitRegister() {
+          if (this.captchaProvider === 'geetest' && !this.geetestValidate) {
+            alert('请先完成极验安全滑块验证。');
+            return;
+          }
+          if (this.captchaProvider === 'graphic' && !this.captchaCode) {
+            alert('请先填写图形验证码以完成人机防刷预检。');
+            return;
+          }
+
           this.loading = true;
           this.statusText = '准备算力盐以防御恶意攻击...';
 
           try {
-            // 1. 获取第二次图形验证码 (发送后验证码已失效，要求用户刷新或重新输入)
             this.statusText = '正在加速计算 POW 注册防爆破挑战...';
-            // 注意：由于发送验证码已经消费了一次验证码，因此最终注册时会基于当前的验证码再次校验
-            const powResult = await SPanelAPI.getPowChallengeAndSolve(this.captchaId, this.captchaCode);
+            
+            let powResult;
+            if (this.captchaProvider === 'geetest') {
+              powResult = await SPanelAPI.getPowChallengeAndSolve({
+                geetestParams: this.geetestValidate
+              });
+            } else {
+              powResult = await SPanelAPI.getPowChallengeAndSolve(this.captchaId, this.captchaCode);
+            }
 
-            // 2. 携带二次算力凭证和表单，提交至注册
             this.statusText = '算力校验成功，正在创建安全账户...';
             await SPanelAPI.request('/auth/register', {
               method: 'POST',
               body: JSON.stringify({
                 email: this.email,
                 password: this.password,
+                userName: this.userName,
+                imType: Number(this.imType),
+                imValue: this.imValue,
+                code: this.code,
                 emailCode: this.emailCode,
                 powSalt: powResult.powSalt,
                 powNonce: powResult.powNonce,
@@ -245,7 +383,7 @@
 
           } catch (err) {
             alert(err.message || '注册异常，请刷新重试。');
-            this.refreshCaptcha(); // 强制重刷图形验证码
+            this.refreshCaptcha(); // 强制重刷
             this.loading = false;
           }
         }

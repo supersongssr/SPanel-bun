@@ -10,7 +10,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <!-- Alpine.js -->
+  <!-- Alpine.js & Geetest v4 -->
+  <script src="https://static.geetest.com/v4/gt4.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <!-- Tailwind Config for Premium Theme -->
   <script>
@@ -74,18 +75,26 @@
           </div>
         </div>
 
-        <!-- 图形验证码 (获取算力盐挑战的前提) -->
-        <div>
+        <!-- 图形验证码 (captchaProvider === 'graphic') -->
+        <div x-show="captchaProvider === 'graphic'">
           <label class="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">图形验证码</label>
           <div class="flex space-x-3">
             <div class="relative flex-1">
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500"><i class="fa-solid fa-shield-halved"></i></span>
-              <input type="text" required x-model="captchaCode" placeholder="验证码" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-300">
+              <input type="text" :required="captchaProvider === 'graphic'" x-model="captchaCode" placeholder="验证码" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-300">
             </div>
             <!-- 验证码 SVG 卡片 -->
             <div @click="refreshCaptcha" class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden cursor-pointer h-12 w-28 flex items-center justify-center transition hover:border-indigo-500" x-html="captchaSvg" title="点击刷新">
               <span class="text-slate-600 text-xs animate-pulse">加载中...</span>
             </div>
+          </div>
+        </div>
+
+        <!-- 极验验证码 (captchaProvider === 'geetest') -->
+        <div x-show="captchaProvider === 'geetest'" class="space-y-2">
+          <label class="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">人机安全校验</label>
+          <div id="geetest-captcha" class="w-full min-h-12 flex items-center justify-center bg-slate-950/80 border border-slate-800 rounded-xl overflow-hidden py-1">
+            <span class="text-slate-500 text-xs animate-pulse">正在载入极验安全组件...</span>
           </div>
         </div>
 
@@ -123,34 +132,97 @@
         captchaCode: '',
         captchaId: '',
         captchaSvg: '',
+        captchaProvider: 'graphic',
+        geetestId: '',
+        geetestValidate: null,
+        geetestCaptchaObj: null,
         loading: false,
         statusText: '正在提交...',
 
         async init() {
-          this.refreshCaptcha();
+          await this.loadCaptcha();
+        },
+
+        async loadCaptcha() {
+          try {
+            const res = await SPanelAPI.request('/auth/captcha', { method: 'GET' });
+            this.captchaProvider = res.captcha_provider || 'graphic';
+            if (this.captchaProvider === 'geetest') {
+              this.geetestId = res.geetest_id;
+              this.$nextTick(() => {
+                this.initGeetest();
+              });
+            } else {
+              this.captchaId = res.captchaId;
+              this.captchaSvg = res.svg;
+              this.captchaCode = '';
+            }
+          } catch (err) {
+            console.error('拉取验证码配置失败:', err);
+          }
+        },
+
+        initGeetest() {
+          if (window.initGeetest4) {
+            window.initGeetest4({
+              captchaId: this.geetestId,
+              product: 'float',
+              onError: (err) => {
+                console.error('[Geetest] config.onError:', err);
+              }
+            }, (captchaObj) => {
+              const container = document.getElementById('geetest-captcha');
+              if (container) container.innerHTML = '';
+              captchaObj.appendTo('#geetest-captcha');
+              captchaObj.onSuccess(() => {
+                this.geetestValidate = captchaObj.getValidate();
+              });
+              this.geetestCaptchaObj = captchaObj;
+            });
+          } else {
+            console.error('[Geetest] initGeetest4 is not defined');
+          }
         },
 
         async refreshCaptcha() {
-          try {
-            const res = await SPanelAPI.request('/auth/captcha', { method: 'GET' });
-            this.captchaId = res.captchaId;
-            this.captchaSvg = res.svg;
-            this.captchaCode = '';
-          } catch (err) {
-            alert('图形验证码拉取失败，请检查网络。');
+          if (this.captchaProvider === 'geetest') {
+            if (this.geetestCaptchaObj) {
+              this.geetestCaptchaObj.reset();
+            }
+            this.geetestValidate = null;
+          } else {
+            try {
+              const res = await SPanelAPI.request('/auth/captcha', { method: 'GET' });
+              this.captchaId = res.captchaId;
+              this.captchaSvg = res.svg;
+              this.captchaCode = '';
+            } catch (err) {
+              alert('图形验证码拉取失败，请检查网络。');
+            }
           }
         },
 
         async submitLogin() {
+          if (this.captchaProvider === 'geetest' && !this.geetestValidate) {
+            alert('请先完成极验滑动验证。');
+            return;
+          }
+
           this.loading = true;
           this.statusText = '正在校验验证码并下发算力盐...';
 
           try {
-            // 1. 调用 M7.1 通信核，自动获取 POW 算力挑战并在后台 Web Worker 中解算 Nonce
             this.statusText = '正在加速计算 POW 算力防CC挑战...';
-            const powResult = await SPanelAPI.getPowChallengeAndSolve(this.captchaId, this.captchaCode);
+            
+            let powResult;
+            if (this.captchaProvider === 'geetest') {
+              powResult = await SPanelAPI.getPowChallengeAndSolve({
+                geetestParams: this.geetestValidate
+              });
+            } else {
+              powResult = await SPanelAPI.getPowChallengeAndSolve(this.captchaId, this.captchaCode);
+            }
 
-            // 2. 算力校验成功，将算力凭证附带在登录表单中提交
             this.statusText = '算力校验成功，正在验证账户密码...';
             const loginResult = await SPanelAPI.request('/auth/login', {
               method: 'POST',
@@ -162,7 +234,6 @@
               })
             });
 
-            // 3. 登录成功，将会话写入 LocalStorage，利用同步 Shield Guard 完美跳转
             localStorage.setItem('spanel_jwt', loginResult.data.token);
             localStorage.setItem('spanel_user', JSON.stringify(loginResult.data.user));
 
@@ -177,7 +248,7 @@
 
           } catch (err) {
             alert(err.message || '登录异常，请重试。');
-            this.refreshCaptcha(); // 登录失败强制更新验证码，防爆破
+            this.refreshCaptcha();
             this.loading = false;
           }
         }
