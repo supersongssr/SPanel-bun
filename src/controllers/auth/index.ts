@@ -22,6 +22,7 @@ export const authController = new Elysia({ prefix: '/api/v1/auth' })
     await redis.set(`captcha:${captchaId}`, captcha.text.toLowerCase(), 'EX', 300);
     
     return {
+      status: 'success',
       captchaId,
       svg: captcha.data,
     };
