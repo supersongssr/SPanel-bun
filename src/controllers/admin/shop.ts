@@ -29,6 +29,36 @@ export const adminShopController = new Elysia({ prefix: '/admin' })
   })
 
   /**
+   * 1.5 获取单个套餐详情
+   */
+  .get('/shop/:id', async ({ userId, isAdmin, params, set }) => {
+    requireAdmin({ userId, isAdmin, set });
+
+    const shopId = Number(params.id);
+    const rows = await db.select().from(shopTable).where(eq(shopTable.id, shopId)).limit(1);
+
+    if (rows.length === 0) {
+      set.status = 404;
+      return { status: 'error', message: '商品套餐不存在。' };
+    }
+
+    const shop = rows[0];
+
+    return {
+      status: 'success',
+      data: {
+        id: shop.id,
+        name: shop.name,
+        price: shop.price,
+        content: shop.content,
+        auto_renew: shop.autoRenew === 1,
+        auto_reset_bandwidth: shop.autoResetBandwidth === 1,
+        status: shop.status === 1 ? 'on_sale' : 'hidden'
+      }
+    };
+  })
+
+  /**
    * 2. 创建新套餐商品
    */
   .post('/shop', async ({ userId, isAdmin, body, set }) => {

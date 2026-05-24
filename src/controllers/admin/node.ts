@@ -37,6 +37,44 @@ export const adminNodeController = new Elysia({ prefix: '/admin' })
   })
 
   /**
+   * 1.5 获取单个物理节点详情
+   */
+  .get('/node/:id', async ({ userId, isAdmin, params, set }) => {
+    requireAdmin({ userId, isAdmin, set });
+
+    const nodeId = Number(params.id);
+    const rows = await db.select().from(nodeTable).where(eq(nodeTable.id, nodeId)).limit(1);
+    
+    if (rows.length === 0) {
+      set.status = 404;
+      return { status: 'error', message: '物理节点不存在。' };
+    }
+
+    const node = rows[0];
+
+    return {
+      status: 'success',
+      data: {
+        id: node.id,
+        name: node.name,
+        server: node.server,
+        method: node.method,
+        info: node.info,
+        status: node.status,
+        type: node.type === 1,
+        traffic_rate: node.trafficRate,
+        node_group: node.nodeGroup,
+        node_class: node.nodeClass,
+        node_speedlimit: node.nodeSpeedlimit,
+        node_connector: node.nodeConnector,
+        node_bandwidth: node.nodeBandwidth,
+        traffic_limit: node.trafficLimit.toString(),
+        country_code: node.countryCode || 'UN'
+      }
+    };
+  })
+
+  /**
    * 2. 创建新物理节点
    */
   .post('/shop', async () => {

@@ -41,12 +41,27 @@
           <span class="font-outfit text-2xl font-bold bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent">SPanel</span>
           <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-semibold border border-indigo-500/20">Member</span>
         </div>
-        <div class="flex items-center space-x-6 text-sm">
-          <a href="/user/dashboard.html" class="text-slate-400 hover:text-indigo-400 transition font-medium"><i class="fa-solid fa-chart-line mr-1.5"></i>控制台</a>
-          <a href="/user/nodes.html" class="text-indigo-400 hover:text-indigo-300 transition font-medium"><i class="fa-solid fa-server mr-1.5"></i>节点列表</a>
-          <a href="/user/shop.html" class="text-slate-400 hover:text-indigo-400 transition font-medium"><i class="fa-solid fa-store mr-1.5"></i>套餐商店</a>
-          <a href="/user/tickets.html" class="text-slate-400 hover:text-indigo-400 transition font-medium"><i class="fa-solid fa-ticket mr-1.5"></i>工单支持</a>
-          <button @click="logout" class="text-rose-400 hover:text-rose-300 transition font-medium"><i class="fa-solid fa-right-from-bracket mr-1.5"></i>退出</button>
+        <div class="flex items-center space-x-6 text-sm overflow-x-auto scrollbar-none">
+          <a href="/user/dashboard.html" class="text-slate-400 hover:text-indigo-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-chart-line mr-1.5"></i>控制台</a>
+          <a href="/user/nodes.html" class="text-indigo-400 hover:text-indigo-300 transition font-medium whitespace-nowrap"><i class="fa-solid fa-server mr-1.5"></i>节点列表</a>
+          <a href="/user/relay.html" class="text-slate-400 hover:text-indigo-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-route mr-1.5"></i>中转规则</a>
+          <a href="/user/shop.html" class="text-slate-400 hover:text-indigo-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-store mr-1.5"></i>套餐商店</a>
+          <a href="/user/code.html" class="text-slate-400 hover:text-indigo-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-credit-card mr-1.5"></i>卡密充值</a>
+          <a href="/user/invite.html" class="text-slate-400 hover:text-indigo-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-gift mr-1.5"></i>推广联盟</a>
+          <a href="/user/tickets.html" class="text-slate-400 hover:text-indigo-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-ticket mr-1.5"></i>工单支持</a>
+          
+          <!-- 用户下拉子菜单 -->
+          <div class="relative" x-data="{ open: false }" @click.away="open = false">
+            <button @click="open = !open" class="text-slate-400 hover:text-indigo-400 transition font-medium whitespace-nowrap focus:outline-none flex items-center">
+              <i class="fa-solid fa-user-gear mr-1.5"></i>我的账户<i class="fa-solid fa-chevron-down text-[10px] ml-1 transition" :class="open ? 'rotate-180' : ''"></i>
+            </button>
+            <div class="absolute right-0 mt-2 w-40 rounded-xl bg-slate-900 border border-slate-800 shadow-xl py-1 z-50" x-show="open" x-transition>
+              <a href="/user/profile.html" class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 transition"><i class="fa-solid fa-user mr-2"></i>个人中心</a>
+              <a href="/user/edit.html" class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 transition"><i class="fa-solid fa-shield-halved mr-2"></i>安全设置</a>
+              <hr class="border-slate-800 my-1">
+              <button @click="logout" class="w-full text-left px-4 py-2 text-xs text-rose-400 hover:bg-rose-950/20 transition"><i class="fa-solid fa-right-from-bracket mr-2"></i>退出登录</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

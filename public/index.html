@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPanel - 全球高速安全网络中转与加速代理门户</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            outfit: ['Outfit', 'sans-serif'],
+            inter: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .glow-border:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 0 25px rgba(99, 102, 241, 0.15);
+    }
+  </style>
+</head>
+<body class="min-h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black text-slate-100 flex flex-col justify-between overflow-x-hidden" x-data="landingPage()">
+  
+  <!-- 头部导航 -->
+  <nav class="border-b border-slate-900 bg-slate-950/40 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo -->
+        <div class="flex items-center space-x-3">
+          <span class="font-outfit text-3xl font-extrabold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight">SPanel</span>
+          <span class="text-[9px] uppercase px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold tracking-widest font-outfit">Next-Gen</span>
+        </div>
+
+        <!-- 登录/注册按钮组 -->
+        <div class="flex items-center space-x-4">
+          <a href="/auth/login.html" class="text-xs text-slate-400 hover:text-white transition font-semibold">登录控制台</a>
+          <a href="/auth/register.html" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:brightness-110 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition active:scale-[0.98] shadow-[0_0_15px_rgba(99,102,241,0.25)]">
+            创建免费账户
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主体横幅区 (Hero Area) -->
+  <header class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-24 text-center">
+    <!-- 背景极光炫彩 -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/10 blur-[120px] rounded-full -z-10"></div>
+    
+    <div class="space-y-6 max-w-4xl mx-auto">
+      <span class="inline-flex items-center space-x-2 text-[10px] bg-indigo-500/10 border border-indigo-500/20 px-3.5 py-1.5 rounded-full text-indigo-400 font-semibold tracking-wide uppercase">
+        <i class="fa-solid fa-sparkles mr-1 animate-pulse"></i> 极速中转 · 全链路 IEPL 专线级网络加速
+      </span>
+      
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight font-outfit text-white leading-tight">
+        重新定义您的 <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">全球网络连接</span> 体验
+      </h1>
+      
+      <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+        SPanel 搭载先进的全球多入口中转与负载均衡架构。精选高速 BGP/IEPL 专线，提供更强的主动防御与更低的跨境丢包率。让您无缝跨越地理阻碍，享受极致宽带网络。
+      </p>
+
+      <div class="pt-6 flex justify-center space-x-4">
+        <a href="/auth/register.html" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:brightness-110 text-white px-8 py-3.5 rounded-xl text-sm font-bold transition active:scale-[0.98] shadow-lg shadow-indigo-500/20">
+          立即开启加速之旅 <i class="fa-solid fa-arrow-right ml-1.5"></i>
+        </a>
+        <a href="#features" class="bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 px-6 py-3.5 rounded-xl text-sm font-semibold transition">
+          深入了解特性
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 特性展示区 (Features) -->
+  <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24 sm:mt-36">
+    <div class="text-center mb-16 space-y-3">
+      <h2 class="text-2xl sm:text-3xl font-bold font-outfit text-white">我们为什么与众不同？</h2>
+      <p class="text-slate-400 text-xs sm:text-sm max-w-md mx-auto">以技术美德与匠心架构设计，为您提供无可挑剔的安全加速品质。</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <!-- 特性一 -->
+      <div class="glass-card p-8 rounded-3xl glow-border transition duration-500">
+        <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-6">
+          <i class="fa-solid fa-server text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-white mb-2">全球分布式中转</h3>
+        <p class="text-slate-400 text-xs leading-relaxed">国内多路 BGP 优质带宽入口，支持配置自定义中转路由映射，自适应全球复杂路由优化。</p>
+      </div>
+
+      <!-- 特性二 -->
+      <div class="glass-card p-8 rounded-3xl glow-border transition duration-500">
+        <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-6">
+          <i class="fa-solid fa-shield-halved text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-white mb-2">AEAD 端到端加密</h3>
+        <p class="text-slate-400 text-xs leading-relaxed">全面兼容现代 Shadowsocks 与 V2Ray 协议。强制使用最前沿的加密隧道，强力保障通信隐私。</p>
+      </div>
+
+      <!-- 特性三 -->
+      <div class="glass-card p-8 rounded-3xl glow-border transition duration-500">
+        <div class="w-12 h-12 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 mb-6">
+          <i class="fa-solid fa-chart-line text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-white mb-2">高授信带宽不限速</h3>
+        <p class="text-slate-400 text-xs leading-relaxed">系统所有节点带宽均采用高承载冗余设计，不限速不设阻，满足 4K/8K 级超高清无缝流媒体需求。</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 精选套餐商店明细 -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24 sm:mt-36 mb-24">
+    <div class="text-center mb-16 space-y-3">
+      <h2 class="text-2xl sm:text-3xl font-bold font-outfit text-white">透明合理的订阅套餐计划</h2>
+      <p class="text-slate-400 text-xs sm:text-sm max-w-md mx-auto">无论您是个人轻度冲浪，还是跨境企业团队，均可在此选配符合您带宽需求的产品。</p>
+    </div>
+
+    <!-- 演示套餐卡片 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+      
+      <!-- 套餐卡片 1 -->
+      <div class="glass-card p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between hover:border-slate-700 transition">
+        <div class="space-y-4">
+          <span class="text-[9px] uppercase px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-400 font-bold font-outfit">VIP 1 Light</span>
+          <h4 class="text-xl font-bold text-white font-outfit mt-4">标准轻度体验套餐</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">满足个人轻度网络社交、查询文献及基础中转需求。</p>
+          <hr class="border-slate-850 my-4">
+          <ul class="text-[10px] text-slate-400 space-y-2">
+            <li><i class="fa-solid fa-circle-check text-indigo-400 mr-1.5"></i> <strong>100 GB</strong> 每月高速流量上限</li>
+            <li><i class="fa-solid fa-circle-check text-indigo-400 mr-1.5"></i> 尊享全球 <strong>10+</strong> 基础中转节点</li>
+            <li><i class="fa-solid fa-circle-check text-indigo-400 mr-1.5"></i> <strong>1x</strong> 费率常规折扣</li>
+            <li><i class="fa-solid fa-circle-check text-indigo-400 mr-1.5"></i> 3 个并发活跃连接终端</li>
+          </ul>
+        </div>
+        <div class="mt-8 pt-4 border-t border-slate-850">
+          <div class="flex items-baseline space-x-1">
+            <span class="text-2xl font-bold font-outfit text-white">￥15.00</span>
+            <span class="text-[10px] text-slate-500">/ 月</span>
+          </div>
+          <a href="/auth/register.html" class="block w-full text-center bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 py-2.5 rounded-xl text-xs font-semibold mt-4 transition">立即订阅体验</a>
+        </div>
+      </div>
+
+      <!-- 套餐卡片 2 -->
+      <div class="glass-card p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.1)] hover:border-indigo-500/50 transition">
+        <div class="absolute right-4 top-4 bg-indigo-500 text-white text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded font-outfit">Popular</div>
+        <div class="space-y-4">
+          <span class="text-[9px] uppercase px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 font-bold font-outfit border border-indigo-500/20">VIP 2 Standard</span>
+          <h4 class="text-xl font-bold text-white font-outfit mt-4">尊享极速专线套餐</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">提供 IEPL 独立专线加速入口，专为极速办公、影视流媒体设计。</p>
+          <hr class="border-slate-850 my-4">
+          <ul class="text-[10px] text-slate-400 space-y-2">
+            <li><i class="fa-solid fa-circle-check text-indigo-400 mr-1.5"></i> <strong>300 GB</strong> 每月高速流量上限</li>
+            <li><i class="fa-solid fa-circle-check text-indigo-400 mr-1.5"></i> 尊享全球 <strong>30+</strong> IEPL 专线中转</li>
+            <li><i class="fa-solid fa-circle-check text-indigo-400 mr-1.5"></i> <strong>0.5x</strong> 专线超级折扣费率</li>
+            <li><i class="fa-solid fa-circle-check text-indigo-400 mr-1.5"></i> 10 个并发活跃连接终端</li>
+          </ul>
+        </div>
+        <div class="mt-8 pt-4 border-t border-slate-850">
+          <div class="flex items-baseline space-x-1">
+            <span class="text-2xl font-bold font-outfit text-emerald-400">￥35.00</span>
+            <span class="text-[10px] text-slate-500">/ 月</span>
+          </div>
+          <a href="/auth/register.html" class="block w-full text-center bg-gradient-to-r from-indigo-500 to-pink-500 hover:brightness-110 text-white py-2.5 rounded-xl text-xs font-semibold mt-4 transition">立即订阅体验</a>
+        </div>
+      </div>
+
+      <!-- 套餐卡片 3 -->
+      <div class="glass-card p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between hover:border-slate-700 transition">
+        <div class="space-y-4">
+          <span class="text-[9px] uppercase px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-400 font-bold font-outfit">VIP 3 Premium</span>
+          <h4 class="text-xl font-bold text-white font-outfit mt-4">企业专属旗舰套餐</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">大流量高并发承载，专为出海企业团队跨境电商、矩阵宣发打造。</p>
+          <hr class="border-slate-850 my-4">
+          <ul class="text-[10px] text-slate-400 space-y-2">
+            <li><i class="fa-solid fa-circle-check text-indigo-400 mr-1.5"></i> <strong>1 TB</strong> 每月超大授信流量上限</li>
+            <li><i class="fa-solid fa-circle-check text-indigo-400 mr-1.5"></i> 尊享全球 <strong>All</strong> 旗舰专属网络</li>
+            <li><i class="fa-solid fa-circle-check text-indigo-400 mr-1.5"></i> 独占最高优先级响应支持</li>
+            <li><i class="fa-solid fa-circle-check text-indigo-400 mr-1.5"></i> 活跃连接设备终端不设限</li>
+          </ul>
+        </div>
+        <div class="mt-8 pt-4 border-t border-slate-850">
+          <div class="flex items-baseline space-x-1">
+            <span class="text-2xl font-bold font-outfit text-white">￥90.00</span>
+            <span class="text-[10px] text-slate-500">/ 月</span>
+          </div>
+          <a href="/auth/register.html" class="block w-full text-center bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 py-2.5 rounded-xl text-xs font-semibold mt-4 transition">立即订阅体验</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 页脚 (Footer) -->
+  <footer class="border-t border-slate-900 bg-slate-950 py-8 text-center text-xs text-slate-500 leading-relaxed">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <p>© 2026 SPanel. All Rights Reserved. Powered by ElysiaJS & Bun.</p>
+      <p class="text-[10px] text-slate-650 mt-1">请遵守您当地国家及服务器所在地区网络通信法律法规。严禁将本服务用于任何非法用途。</p>
+    </div>
+  </footer>
+
+  <script>
+    function landingPage() {
+      return {
+        init() {
+          // 可以在此拉取动态公告或状态指标，提升交互感
+        }
+      }
+    }
+  </script>
+</body>
+</html>

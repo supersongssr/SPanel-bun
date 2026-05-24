@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>上架新代理节点 - SPanel</title>
+  <script src="/assets/js/auth-guard.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            outfit: ['Outfit', 'sans-serif'],
+            inter: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="min-h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black text-slate-100 pb-12" x-data="adminNodeCreatePage()">
+  
+  <!-- 顶部导航栏 -->
+  <nav class="border-b border-slate-800 bg-slate-950/85 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <span class="font-outfit text-2xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">SPanel</span>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 font-semibold border border-purple-500/20">Admin</span>
+        </div>
+        <div class="flex items-center space-x-5 text-sm overflow-x-auto py-2 custom-scrollbar">
+          <a href="/admin/dashboard.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-chart-pie mr-1.5"></i>监控</a>
+          <a href="/admin/users.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-user-gear mr-1.5"></i>会员</a>
+          <a href="/admin/nodes.html" class="text-purple-400 hover:text-purple-300 transition font-medium whitespace-nowrap"><i class="fa-solid fa-server mr-1.5"></i>节点</a>
+          <a href="/admin/shops.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-bag-shopping mr-1.5"></i>商品</a>
+          <a href="/admin/tickets.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-envelope-open-text mr-1.5"></i>工单</a>
+          <a href="/admin/announcements.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-bullhorn mr-1.5"></i>公告</a>
+          <a href="/admin/coupons.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-ticket mr-1.5"></i>优惠券</a>
+          <a href="/admin/codes.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-barcode mr-1.5"></i>卡密</a>
+          <a href="/admin/invites.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-users mr-1.5"></i>推广</a>
+          <a href="/admin/audits.html" class="text-slate-400 hover:text-purple-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-shield-halved mr-1.5"></i>审计</a>
+          <button @click="logout" class="text-rose-400 hover:text-rose-300 transition font-medium whitespace-nowrap"><i class="fa-solid fa-right-from-bracket mr-1.5"></i>退出</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主体内容 -->
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+    <div class="mb-8 flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-semibold font-outfit text-white">上架全新的全球加速节点</h2>
+        <p class="text-slate-400 text-sm mt-1">配置物理节点连接端点，设定等级门槛与计费乘数。</p>
+      </div>
+      <a href="/admin/nodes.html" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-750 px-4 py-2 rounded-xl text-xs font-semibold transition"><i class="fa-solid fa-chevron-left mr-1.5"></i>返回节点列表</a>
+    </div>
+
+    <!-- 表单卡片 -->
+    <div class="glass-card rounded-3xl p-8 border border-slate-800/80">
+      <form @submit.prevent="submitForm" class="space-y-6">
+        <div class="grid grid-cols-2 gap-6">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">节点名称</label>
+            <input type="text" required x-model="form.name" placeholder="例如：香港 BGP 高速一期" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">国家/地区代码</label>
+            <input type="text" required x-model="form.country_code" placeholder="例如：HK" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">加速服务器连接地址 (IP/域名)</label>
+          <input type="text" required x-model="form.server" placeholder="例如：hk1.node.yourdomain.com" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition font-mono">
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">加密协议 (Cipher)</label>
+            <input type="text" required x-model="form.method" placeholder="例如：aes-256-gcm" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">节点费率比率 (traffic_rate)</label>
+            <input type="text" required x-model="form.traffic_rate" placeholder="例如：1.00 (免费线路填 0.00)" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">可访问的会员等级门槛 (VIP)</label>
+            <input type="number" required x-model.number="form.node_class" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">节点分组 ID</label>
+            <input type="number" required x-model.number="form.node_group" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-6">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">连接端口限速 (Mbps)</label>
+            <input type="text" required x-model="form.node_speedlimit" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">单端口最大并发连接数</label>
+            <input type="number" required x-model.number="form.node_connector" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">节点出口带宽限制 (GB)</label>
+            <input type="text" required x-model="form.node_bandwidth" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">可用流量限制 (Bytes, 例如 1000GB)</label>
+            <input type="text" required x-model="form.traffic_limit" placeholder="输入总限制字节数，例如：1000000000000" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">节点物理描述/状态简评</label>
+            <input type="text" required x-model="form.status" placeholder="例如：优质香港CN2，稳定极速" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">详细描述信息/物理卡片简介</label>
+          <input type="text" required x-model="form.info" placeholder="例如：VIP3以上线路，多路高可用" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:border-purple-500 focus:outline-none transition">
+        </div>
+
+        <div class="pt-2">
+          <label class="flex items-center space-x-3 cursor-pointer">
+            <input type="checkbox" x-model="form.type" class="rounded border-slate-800 text-purple-600 bg-slate-900 focus:ring-purple-500">
+            <span class="text-xs text-slate-300 select-none">立即在售显示 (勾选在前台展示，未勾选仅在后台用于边缘守护节点调度)</span>
+          </label>
+        </div>
+
+        <div class="pt-6 border-t border-slate-800 flex justify-end space-x-4">
+          <a href="/admin/nodes.html" class="bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-850 px-6 py-3 rounded-xl text-xs font-semibold transition">取消</a>
+          <button type="submit" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-6 py-3 rounded-xl text-xs font-semibold transition shadow-lg shadow-purple-600/20">确认上架节点</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="/assets/js/api.js"></script>
+  <script>
+    function adminNodeCreatePage() {
+      return {
+        form: {
+          name: '',
+          country_code: 'HK',
+          server: '',
+          method: 'aes-256-gcm',
+          traffic_rate: '1.00',
+          node_class: 0,
+          node_group: 0,
+          node_speedlimit: '0.00',
+          node_connector: 0,
+          node_bandwidth: '0.00',
+          traffic_limit: '1099511627776', // 默认 1TB 字节数
+          status: '流畅在线',
+          info: '优质骨干加速线路',
+          type: true
+        },
+
+        async submitForm() {
+          try {
+            await SPanelAPI.request('/admin/node', {
+              method: 'POST',
+              body: JSON.stringify(this.form)
+            });
+            alert('全球物理加速节点创建并成功上架！');
+            window.location.replace('/admin/nodes.html');
+          } catch (err) {
+            alert('创建节点失败: ' + err.message);
+          }
+        },
+
+        logout() {
+          localStorage.removeItem('spanel_jwt');
+          localStorage.removeItem('spanel_user');
+          window.location.replace('/auth/login.html');
+        }
+      }
+    }
+  </script>
+</body>
+</html>

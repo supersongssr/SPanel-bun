@@ -6,7 +6,7 @@
   <title>商品与订单管理 - SPanel</title>
   <script src="/assets/js/auth-guard.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link class="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script>
@@ -39,9 +39,6 @@
     .custom-scrollbar::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.2);
     }
   </style>
 </head>
@@ -88,7 +85,7 @@
     <!-- TAB 1: 商品套餐列表 -->
     <div x-show="activeTab === 'shops'">
       <div class="flex justify-end mb-6">
-        <button @click="openCreateModal()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-lg shadow-indigo-600/25"><i class="fa-solid fa-plus mr-1.5"></i>新建商品套餐</button>
+        <a href="/admin/shop-create.html" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-lg shadow-indigo-600/25"><i class="fa-solid fa-plus mr-1.5"></i>新建商品套餐</a>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6" x-show="shops.length > 0">
@@ -115,7 +112,7 @@
             </div>
 
             <div class="flex space-x-2 pt-4 border-t border-slate-800/60">
-              <button @click="openEditModal(shop)" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2 rounded-lg transition"><i class="fa-solid fa-pen mr-1"></i>编辑</button>
+              <a :href="'/admin/shop-edit.html?id=' + shop.id" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-center text-xs font-semibold py-2 rounded-lg transition flex items-center justify-center"><i class="fa-solid fa-pen mr-1"></i>编辑</a>
               <button @click="deleteShop(shop.id)" class="bg-rose-950/40 hover:bg-rose-950/60 border border-rose-500/20 hover:border-rose-500/40 text-rose-400 text-xs font-semibold px-3 py-2 rounded-lg transition"><i class="fa-solid fa-trash"></i></button>
             </div>
           </div>
@@ -173,50 +170,6 @@
       </div>
     </div>
 
-    <!-- MODAL: 创建/编辑商品 -->
-    <div x-show="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md" x-cloak>
-      <div class="glass-card rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl border border-slate-800" @click.away="modalOpen = false">
-        <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/25">
-          <h3 class="text-lg font-bold text-white font-outfit" x-text="editMode ? '修改商品套餐' : '新建商品套餐'"></h3>
-          <button @click="modalOpen = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-        </div>
-        <form @submit.prevent="submitForm" class="p-6 space-y-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">套餐名称</label>
-            <input type="text" x-model="form.name" required class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2.5 text-white text-sm focus:border-purple-500 focus:outline-none transition">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">套餐价格 (元)</label>
-            <input type="text" x-model="form.price" required class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2.5 text-white text-sm focus:border-purple-500 focus:outline-none transition" placeholder="例如：19.90">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">规格说明 (JSON 规范或内容文本)</label>
-            <textarea x-model="form.content" rows="4" required class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2.5 text-white text-sm focus:border-purple-500 focus:outline-none transition" placeholder="请输入规格配置，例如：&#10;等级天数: 30&#10;可用流量: 100GB&#10;账户等级: 1"></textarea>
-          </div>
-          <div class="grid grid-cols-2 gap-4 pt-2">
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" x-model="form.auto_renew" class="rounded border-slate-800 text-purple-600 bg-slate-900 focus:ring-purple-500">
-              <span class="text-xs text-slate-300 select-none">支持自动续费</span>
-            </label>
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" x-model="form.auto_reset_bandwidth" class="rounded border-slate-800 text-purple-600 bg-slate-900 focus:ring-purple-500">
-              <span class="text-xs text-slate-300 select-none">次月自动重置流量</span>
-            </label>
-          </div>
-          <div class="pt-2">
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" x-model="form.status" class="rounded border-slate-800 text-purple-600 bg-slate-900 focus:ring-purple-500">
-              <span class="text-xs text-slate-300 select-none">立即上架销售</span>
-            </label>
-          </div>
-          <div class="pt-6 border-t border-slate-800 flex justify-end space-x-3">
-            <button type="button" @click="modalOpen = false" class="bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-850 px-5 py-2.5 rounded-xl text-sm font-medium transition">取消</button>
-            <button type="submit" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-lg shadow-purple-600/20" x-text="editMode ? '保存修改' : '立即创建'"></button>
-          </div>
-        </form>
-      </div>
-    </div>
-
   </main>
 
   <script src="/assets/js/api.js"></script>
@@ -226,19 +179,6 @@
         activeTab: 'shops',
         shops: [],
         boughtList: [],
-        
-        // Modal & Form States
-        modalOpen: false,
-        editMode: false,
-        activeShopId: null,
-        form: {
-          name: '',
-          price: '',
-          content: '',
-          auto_renew: false,
-          auto_reset_bandwidth: false,
-          status: true
-        },
 
         async init() {
           await this.fetchShops();
@@ -260,54 +200,6 @@
             this.boughtList = res.data;
           } catch (err) {
             console.error('加载购买流水失败:', err.message);
-          }
-        },
-
-        openCreateModal() {
-          this.editMode = false;
-          this.activeShopId = null;
-          this.form = {
-            name: '',
-            price: '',
-            content: '',
-            auto_renew: false,
-            auto_reset_bandwidth: false,
-            status: true
-          };
-          this.modalOpen = true;
-        },
-
-        openEditModal(shop) {
-          this.editMode = true;
-          this.activeShopId = shop.id;
-          this.form = {
-            name: shop.name,
-            price: shop.price,
-            content: shop.content,
-            auto_renew: shop.auto_renew,
-            auto_reset_bandwidth: shop.auto_reset_bandwidth,
-            status: shop.status === 'on_sale'
-          };
-          this.modalOpen = true;
-        },
-
-        async submitForm() {
-          try {
-            if (this.editMode) {
-              await SPanelAPI.request(`/admin/shop/${this.activeShopId}`, {
-                method: 'PUT',
-                body: JSON.stringify(this.form)
-              });
-            } else {
-              await SPanelAPI.request('/admin/shop', {
-                method: 'POST',
-                body: JSON.stringify(this.form)
-              });
-            }
-            this.modalOpen = false;
-            await this.fetchShops();
-          } catch (err) {
-            alert('操作失败: ' + err.message);
           }
         },
 

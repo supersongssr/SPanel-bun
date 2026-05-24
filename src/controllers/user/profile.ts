@@ -1,7 +1,7 @@
 import { Elysia, t } from 'elysia';
 import { db } from '../../config/database';
-import { userTable } from '../../db/schema';
-import { eq } from 'drizzle-orm';
+import { userTable, loginIpTable, aliveIpTable } from '../../db/schema';
+import { eq, and, desc, sql } from 'drizzle-orm';
 import { authDerive, requireAuth } from '../../middleware/auth';
 
 
@@ -32,6 +32,30 @@ export const userProfileController = new Elysia({ prefix: '/user' })
 
     const user = users[0];
 
+    // 查询最近 10 次登录 IP
+    const loginIps = await db.select({
+      ip: loginIpTable.ip,
+      datetime: loginIpTable.datetime
+    })
+      .from(loginIpTable)
+      .where(eq(loginIpTable.userId, BigInt(uid)))
+      .orderBy(desc(loginIpTable.id))
+      .limit(10);
+
+    // 查询最近 5 分钟活跃的 IP (aliveIpTable)
+    const fiveMinsAgo = BigInt(Math.floor(Date.now() / 1000) - 300);
+    const aliveIps = await db.select({
+      ip: aliveIpTable.ip,
+      datetime: aliveIpTable.datetime
+    })
+      .from(aliveIpTable)
+      .where(and(
+        eq(aliveIpTable.userId, uid),
+        sql`${aliveIpTable.datetime} >= ${fiveMinsAgo}`
+      ))
+      .orderBy(desc(aliveIpTable.id))
+      .limit(10);
+
     return {
       status: 'success',
       data: {
@@ -53,7 +77,15 @@ export const userProfileController = new Elysia({ prefix: '/user' })
         // 如果用户没生成过 2FA 密钥，则动态分配一个以备绑定
         ga_token: user.gaToken || generateGaSecret(),
         invite_num: user.inviteNum,
-        reg_date: user.regDate ? user.regDate.toISOString().replace('T', ' ').substring(0, 19) : ''
+        reg_date: user.regDate ? user.regDate.toISOString().replace('T', ' ').substring(0, 19) : '',
+        login_ips: loginIps.map(item => ({
+          ip: item.ip,
+          datetime: new Date(Number(item.datetime) * 1000).toISOString().replace('T', ' ').substring(0, 19)
+        })),
+        alive_ips: aliveIps.map(item => ({
+          ip: item.ip,
+          datetime: new Date(Number(item.datetime) * 1000).toISOString().replace('T', ' ').substring(0, 19)
+        }))
       }
     };
   })

@@ -1,7 +1,7 @@
 import { Elysia, t } from 'elysia';
 import { db } from '../../config/database';
 import { userTable } from '../../db/schema';
-import { eq, like, or } from 'drizzle-orm';
+import { eq, like, or, desc } from 'drizzle-orm';
 import { authDerive, requireAdmin, signToken } from '../../middleware/auth';
 
 export const adminUserController = new Elysia({ prefix: '/admin' })
@@ -52,6 +52,44 @@ export const adminUserController = new Elysia({ prefix: '/admin' })
     query: t.Object({
       search: t.Optional(t.String())
     })
+  })
+
+  /**
+   * 1.5 获取单个用户账户详情
+   */
+  .get('/user/:id', async ({ userId, isAdmin, params, set }) => {
+    requireAdmin({ userId, isAdmin, set });
+
+    const targetUid = Number(params.id);
+    const rows = await db.select().from(userTable).where(eq(userTable.id, targetUid)).limit(1);
+    
+    if (rows.length === 0) {
+      set.status = 404;
+      return { status: 'error', message: '该会员用户不存在。' };
+    }
+
+    const user = rows[0];
+
+    return {
+      status: 'success',
+      data: {
+        id: user.id,
+        user_name: user.userName,
+        email: user.email,
+        port: user.port,
+        passwd: user.passwd,
+        money: user.money,
+        class: user.class,
+        class_expire: user.classExpire ? user.classExpire.toISOString().substring(0, 16) : '',
+        transfer_enable: user.transferEnable.toString(),
+        u: user.u.toString(),
+        d: user.d.toString(),
+        enable: user.enable === 1,
+        node_group: user.nodeGroup,
+        is_admin: user.isAdmin === 1,
+        reg_date: user.regDate ? user.regDate.toISOString().replace('T', ' ').substring(0, 19) : ''
+      }
+    };
   })
 
   /**
@@ -164,4 +202,77 @@ export const adminUserController = new Elysia({ prefix: '/admin' })
       status: 'success',
       message: '用户账户已物理删除。'
     };
+  })
+
+  /**
+   * 5. 创建新会员账户
+   */
+  .post('/user', async ({ userId, isAdmin, body, set }) => {
+    requireAdmin({ userId, isAdmin, set });
+
+    const { user_name, email, password, money, transfer_enable, class: userClass, node_group, is_admin } = body;
+
+    // 检查邮箱冲突
+    const existing = await db.select().from(userTable).where(eq(userTable.email, email)).limit(1);
+    if (existing.length > 0) {
+      set.status = 400;
+      return { status: 'error', message: '该邮箱已被其他账户注册使用，请更换邮箱。' };
+    }
+
+    // 自动分配空闲端口
+    const maxPortUsers = await db.select({ port: userTable.port })
+      .from(userTable)
+      .orderBy(desc(userTable.port))
+      .limit(1);
+
+    let nextPort = 10001;
+    if (maxPortUsers.length > 0) {
+      nextPort = maxPortUsers[0].port + 1;
+      if (nextPort >= 65535) nextPort = 10001;
+    }
+
+    const passHash = await Bun.password.hash(password, {
+      algorithm: 'bcrypt',
+      cost: 10
+    });
+
+    const ssPasswd = crypto.randomUUID().substring(0, 8); // 8位 Shadowsocks 密码
+    const v2rayUuid = crypto.randomUUID();
+
+    const result = await db.insert(userTable).values({
+      userName: user_name,
+      email: email,
+      pass: passHash,
+      passwd: ssPasswd,
+      v2rayUuid,
+      port: nextPort,
+      u: 0n,
+      d: 0n,
+      transferEnable: BigInt(transfer_enable),
+      money: money,
+      inviteNum: 10, // 默认配给 10 个邀请名额
+      regDate: new Date(),
+      class: userClass,
+      isAdmin: is_admin ? 1 : 0,
+      nodeGroup: node_group
+    });
+
+    return {
+      status: 'success',
+      message: '创建新会员账户成功！',
+      data: {
+        id: result[0]?.insertId
+      }
+    };
+  }, {
+    body: t.Object({
+      user_name: t.String(),
+      email: t.String(),
+      password: t.String(),
+      money: t.String(),
+      transfer_enable: t.String(),
+      class: t.Number(),
+      node_group: t.Number(),
+      is_admin: t.Boolean()
+    })
   });
