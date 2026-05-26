@@ -110,72 +110,277 @@
       </div>
     </div>
 
-    <!-- 流量进度环 -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div class="glass-card p-6 rounded-2xl md:col-span-2">
-        <h3 class="text-lg font-medium text-white mb-6 flex items-center"><i class="fa-solid fa-chart-pie text-indigo-400 mr-2"></i>流量消耗统计</h3>
-        <div class="space-y-6">
-          <div>
-            <div class="flex justify-between text-xs text-slate-400 mb-2">
-              <span>可用带宽占比</span>
-              <span class="font-outfit" x-text="usagePercentage + '%'">0%</span>
-            </div>
-            <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800 p-0.5">
-              <div class="bg-gradient-to-r from-indigo-500 to-pink-500 h-full rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(99,102,241,0.5)]" :style="'width: ' + usagePercentage + '%'"></div>
-            </div>
-          </div>
-          <div class="grid grid-cols-3 gap-4 text-center">
-            <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/50">
-              <span class="block text-slate-500 text-[10px] uppercase font-semibold">已用上行</span>
-              <span class="block text-slate-300 font-outfit text-sm mt-1" x-text="uploadStr">0 B</span>
-            </div>
-            <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/50">
-              <span class="block text-slate-500 text-[10px] uppercase font-semibold">已用下行</span>
-              <span class="block text-slate-300 font-outfit text-sm mt-1" x-text="downloadStr">0 B</span>
-            </div>
-            <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/50">
-              <span class="block text-slate-500 text-[10px] uppercase font-semibold">总授信配额</span>
-              <span class="block text-indigo-400 font-outfit text-sm mt-1" x-text="totalStr">0 B</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 快捷节点导入链接 -->
-      <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-        <div>
-          <h3 class="text-lg font-medium text-white flex items-center mb-4"><i class="fa-solid fa-link text-indigo-400 mr-2"></i>快捷节点导入</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">一键生成您的个性化通用客户端配置订阅。系统防御体系支持 Clash, Surge, Loon, sing-box 及基础 base64 协议自适应解析。</p>
-        </div>
-        <div class="mt-6 space-y-2">
-          <button @click="copySubLink" class="w-full bg-slate-900 border border-slate-800 text-slate-300 hover:border-indigo-500/50 hover:text-white rounded-xl py-2.5 text-xs font-medium transition flex items-center justify-center">
-            <i class="fa-regular fa-copy mr-2"></i>复制通用订阅链接
-          </button>
-          <div class="text-[10px] text-center text-slate-500">为保护您的网络安全，切勿将该订阅外泄。</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 公告看板 -->
-    <div class="glass-card p-6 rounded-2xl">
-      <h3 class="text-lg font-medium text-white mb-6 flex items-center"><i class="fa-solid fa-bullhorn text-indigo-400 mr-2"></i>系统最新公告</h3>
+    <!-- 流量消耗统计 (全宽) -->
+    <div class="glass-card p-6 rounded-2xl mb-8">
+      <h3 class="text-lg font-medium text-white mb-6 flex items-center"><i class="fa-solid fa-chart-pie text-indigo-400 mr-2"></i>流量消耗统计</h3>
       <div class="space-y-6">
-        <template x-for="ann in announcements" :key="ann.id">
-          <div class="border-b border-slate-800/50 pb-6 last:border-0 last:pb-0">
-            <div class="flex items-center justify-between">
-              <span class="text-xs text-indigo-400 font-semibold" x-text="ann.date"></span>
-              <span class="text-[10px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 font-medium">重要公告</span>
-            </div>
-            <!-- 富文本 HTML 呈现 -->
-            <div class="text-sm text-slate-300 mt-3 leading-relaxed" x-html="ann.content"></div>
+        <div>
+          <div class="flex justify-between text-xs text-slate-400 mb-2">
+            <span>可用流量配额占比</span>
+            <span class="font-outfit" x-text="usagePercentage + '%'">0%</span>
           </div>
-        </template>
-        <template x-if="announcements.length === 0">
-          <div class="text-center py-8 text-slate-500 text-xs">暂无任何系统公告。</div>
-        </template>
+          <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800 p-0.5">
+            <div class="bg-gradient-to-r from-indigo-500 to-pink-500 h-full rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(99,102,241,0.5)]" :style="'width: ' + usagePercentage + '%'"></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/50">
+            <span class="block text-slate-500 text-[10px] uppercase font-semibold">已用上行流量</span>
+            <span class="block text-slate-300 font-outfit text-sm mt-1" x-text="uploadStr">0 B</span>
+          </div>
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/50">
+            <span class="block text-slate-500 text-[10px] uppercase font-semibold">已用下行流量</span>
+            <span class="block text-slate-300 font-outfit text-sm mt-1" x-text="downloadStr">0 B</span>
+          </div>
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/50">
+            <span class="block text-slate-500 text-[10px] uppercase font-semibold">总可用授信流量</span>
+            <span class="block text-indigo-400 font-outfit text-sm mt-1" x-text="totalStr">0 B</span>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- 订阅中心与极速客户端教程 -->
+    <div class="glass-card p-6 rounded-3xl mb-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- 左侧：多订阅地址及自动检测 -->
+        <div class="lg:col-span-5 flex flex-col justify-between">
+          <div>
+            <h3 class="text-lg font-medium text-white flex items-center mb-4">
+              <i class="fa-solid fa-cloud-arrow-down text-indigo-400 mr-2"></i>订阅中心与地址智能测速
+            </h3>
+            <p class="text-slate-400 text-xs leading-relaxed mb-6">
+              系统防御支持 Clash, sing-box, Surfboard, Loon 等高级自适应解析。前端将并发检测可用域名，自动挑选延迟最低的优质物理通道。
+            </p>
+            
+            <!-- 订阅域名列表 -->
+            <div class="space-y-3">
+              <span class="block text-slate-500 text-[10px] uppercase font-semibold tracking-wider mb-2">可用的订阅伺服节点列表</span>
+              <template x-for="domain in subDomainsList" :key="domain">
+                <div @click="selectDomain(domain)" class="flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all duration-300" 
+                     :class="selectedDomain === domain ? 'bg-indigo-500/10 border-indigo-500/60 shadow-[0_0_12px_rgba(99,102,241,0.15)] text-white' : 'bg-slate-900/40 border-slate-800 hover:border-slate-700 text-slate-350'">
+                  <div class="flex items-center space-x-2.5 overflow-hidden">
+                    <span class="w-1.5 h-1.5 rounded-full" :class="selectedDomain === domain ? 'bg-indigo-400 animate-pulse' : 'bg-slate-700'"></span>
+                    <span class="text-xs truncate font-mono" x-text="domain"></span>
+                  </div>
+                  
+                  <!-- 延迟 Badge -->
+                  <div class="flex items-center space-x-1.5 font-outfit text-[10px]">
+                    <span x-show="latencies[domain] === 'testing'" class="text-slate-500"><i class="fa-solid fa-spinner animate-spin"></i></span>
+                    <span x-show="latencies[domain] === 'timeout'" class="px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">超时</span>
+                    <span x-show="typeof latencies[domain] === 'number'" 
+                          :class="latencies[domain] < 150 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : (latencies[domain] < 300 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20')"
+                          class="px-2 py-0.5 rounded border font-semibold"
+                          x-text="latencies[domain] + 'ms'"></span>
+                  </div>
+                </div>
+              </template>
+            </div>
+            
+            <!-- 重新测速 -->
+            <button type="button" @click="startSpeedTest" :disabled="speedTestLoading" class="mt-4 text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold flex items-center transition disabled:opacity-50">
+              <i class="fa-solid fa-rotate mr-1.5" :class="speedTestLoading ? 'animate-spin' : ''"></i>重新对订阅地址测速
+            </button>
+          </div>
+
+          <!-- 当前选中的订阅地址 -->
+          <div class="mt-8 pt-6 border-t border-slate-800/80">
+            <span class="block text-slate-500 text-[10px] uppercase font-semibold tracking-wider mb-2.5">当前生成的激活订阅配置</span>
+            
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between space-x-2">
+              <span class="text-[10px] font-mono text-slate-350 truncate select-all" x-text="activeSubLink"></span>
+              <button @click="copyActiveSubLink" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 transition whitespace-nowrap flex items-center">
+                <i class="fa-regular fa-copy mr-1.5"></i>复制
+              </button>
+            </div>
+            
+            <!-- 二维码展现与说明 -->
+            <div class="mt-4 flex items-center space-x-4">
+              <div class="bg-white p-1.5 rounded-xl flex-shrink-0 border border-slate-800">
+                <img :src="qrCodeUrl" alt="QR Code" class="w-20 h-20" x-show="activeSubLink">
+              </div>
+              <div>
+                <span class="block text-xs font-semibold text-slate-200">手机扫码一键配置</span>
+                <span class="block text-[10px] text-slate-500 mt-1 leading-relaxed">为保护您的隐私与网络资产安全，切勿将此订阅及二维码分享给他人。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧：平台客户端安装教程 & 一键导入 -->
+        <div class="lg:col-span-7 border-t lg:border-t-0 lg:border-l border-slate-800/80 pt-8 lg:pt-0 lg:pl-8">
+          <h3 class="text-lg font-medium text-white flex items-center mb-4">
+            <i class="fa-solid fa-circle-play text-indigo-400 mr-2"></i>极速客户端安装教程
+          </h3>
+          
+          <!-- 系统 Tab 切换栏 -->
+          <div class="flex items-center space-x-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800 max-w-sm mb-6">
+            <button @click="activeTab = 'windows'" :class="activeTab === 'windows' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="flex-1 py-2 text-xs rounded-lg transition flex items-center justify-center">
+              <i class="fa-brands fa-windows mr-1.5"></i>Windows
+            </button>
+            <button @click="activeTab = 'android'" :class="activeTab === 'android' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="flex-1 py-2 text-xs rounded-lg transition flex items-center justify-center">
+              <i class="fa-brands fa-android mr-1.5"></i>Android
+            </button>
+            <button @click="activeTab = 'ios'" :class="activeTab === 'ios' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="flex-1 py-2 text-xs rounded-lg transition flex items-center justify-center">
+              <i class="fa-brands fa-apple mr-1"></i>iOS
+            </button>
+            <button @click="activeTab = 'macos'" :class="activeTab === 'macos' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="flex-1 py-2 text-xs rounded-lg transition flex items-center justify-center">
+              <i class="fa-brands fa-apple mr-1"></i>macOS
+            </button>
+          </div>
+
+          <!-- Windows 教程 -->
+          <div x-show="activeTab === 'windows'" class="space-y-6" x-transition>
+            <!-- Clash Verge -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div>
+                <h4 class="text-sm font-semibold text-white flex items-center">
+                  Clash Verge <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">极力推荐</span>
+                </h4>
+                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                  基于 Meta 核心的现代开源客户端，界面极速美观，自带完美中文，性能绝佳。
+                </p>
+                <a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" class="text-[10px] text-slate-500 hover:text-indigo-400 mt-2.5 inline-flex items-center transition">
+                  <i class="fa-solid fa-arrow-down-to-bracket mr-1"></i>前往 GitHub 官方下载页面
+                </a>
+              </div>
+              <button @click="importClash" class="bg-gradient-to-r from-indigo-500 to-pink-500 text-white rounded-xl py-3 px-5 text-xs font-semibold hover:brightness-110 active:scale-[0.98] transition flex items-center justify-center whitespace-nowrap">
+                <i class="fa-solid fa-bolt mr-1.5 animate-pulse"></i>一键导入 Clash
+              </button>
+            </div>
+
+            <!-- sing-box -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div>
+                <h4 class="text-sm font-semibold text-white">sing-box</h4>
+                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                  新一代通用规则代理核心客户端，资源占用极小，具有超轻量、低延迟和强大的解析协议支持。
+                </p>
+              </div>
+              <button @click="importSingBox" class="bg-slate-950 border border-slate-800 text-indigo-400 hover:border-indigo-500/50 hover:text-white rounded-xl py-3 px-5 text-xs font-semibold active:scale-[0.98] transition flex items-center justify-center whitespace-nowrap">
+                <i class="fa-solid fa-bolt mr-1.5"></i>一键导入 sing-box
+              </button>
+            </div>
+          </div>
+
+          <!-- Android 教程 -->
+          <div x-show="activeTab === 'android'" class="space-y-6" x-transition>
+            <!-- Surfboard -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div>
+                <h4 class="text-sm font-semibold text-white flex items-center">
+                  Surfboard 冲浪板 <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">推荐使用</span>
+                </h4>
+                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                  专为安卓深度定制的现代客户端，完美融入系统底层，图表流畅直观，极度省电。
+                </p>
+                <a href="https://github.com/getsurfboard/surfboard/releases" target="_blank" class="text-[10px] text-slate-500 hover:text-indigo-400 mt-2.5 inline-flex items-center transition">
+                  <i class="fa-solid fa-arrow-down-to-bracket mr-1"></i>前往官方发行版本下载
+                </a>
+              </div>
+              <button @click="importSurfboard" class="bg-gradient-to-r from-indigo-500 to-pink-500 text-white rounded-xl py-3 px-5 text-xs font-semibold hover:brightness-110 active:scale-[0.98] transition flex items-center justify-center whitespace-nowrap">
+                <i class="fa-solid fa-bolt mr-1.5 animate-pulse"></i>一键导入 Surfboard
+              </button>
+            </div>
+
+            <!-- Clash Meta -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div>
+                <h4 class="text-sm font-semibold text-white">Clash for Android</h4>
+                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                  经典且使用人数最广泛的 Clash 核心 Android 应用，支持分应用代理和强大规则集分流。
+                </p>
+              </div>
+              <button @click="importClash" class="bg-slate-950 border border-slate-800 text-indigo-400 hover:border-indigo-500/50 hover:text-white rounded-xl py-3 px-5 text-xs font-semibold active:scale-[0.98] transition flex items-center justify-center whitespace-nowrap">
+                <i class="fa-solid fa-bolt mr-1.5"></i>一键导入 Clash
+              </button>
+            </div>
+          </div>
+
+          <!-- iOS 教程 -->
+          <div x-show="activeTab === 'ios'" class="space-y-6" x-transition>
+            <!-- Shadowrocket -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div>
+                <h4 class="text-sm font-semibold text-white flex items-center">
+                  Shadowrocket 小火箭 <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">极力推荐</span>
+                </h4>
+                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                  iOS 平台绝对的首选客户端，功能强大无出其右。支持所有代理协议，且一键订阅极为稳定。<br>
+                  <span class="text-[10px] text-amber-500"><i class="fa-solid fa-triangle-exclamation mr-1"></i>需使用美区/非中国大陆 Apple ID 在 App Store 购买下载。</span>
+                </p>
+              </div>
+              <button @click="importShadowrocket" class="bg-gradient-to-r from-indigo-500 to-pink-500 text-white rounded-xl py-3 px-5 text-xs font-semibold hover:brightness-110 active:scale-[0.98] transition flex items-center justify-center whitespace-nowrap">
+                <i class="fa-solid fa-bolt mr-1.5 animate-pulse"></i>一键导入小火箭
+              </button>
+            </div>
+
+            <!-- Quantumult X & Loon -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-slate-900/40 border border-slate-800/80 p-4 rounded-2xl flex flex-col justify-between">
+                <div>
+                  <h4 class="text-xs font-semibold text-white">Quantumult X (圈X)</h4>
+                  <p class="text-slate-450 text-[10px] mt-1.5 leading-relaxed">
+                    专为极客打造的高定制代理工具，UI极其精致，支持强大的 JS 脚本重写及分流。
+                  </p>
+                </div>
+                <button @click="importQuanX" class="mt-4 w-full bg-slate-950 border border-slate-800 hover:border-indigo-500/50 hover:text-white text-indigo-400 rounded-xl py-2 px-4 text-[10px] font-semibold active:scale-[0.98] transition">
+                  一键导入 Quantumult X
+                </button>
+              </div>
+
+              <div class="bg-slate-900/40 border border-slate-800/80 p-4 rounded-2xl flex flex-col justify-between">
+                <div>
+                  <h4 class="text-xs font-semibold text-white">Loon</h4>
+                  <p class="text-slate-450 text-[10px] mt-1.5 leading-relaxed">
+                    兼具界面易用性与丰富扩展脚本功能的 iOS 代理客户端，适合各类中高级玩家。
+                  </p>
+                </div>
+                <button @click="importLoon" class="mt-4 w-full bg-slate-950 border border-slate-800 hover:border-indigo-500/50 hover:text-white text-indigo-400 rounded-xl py-2 px-4 text-[10px] font-semibold active:scale-[0.98] transition">
+                  一键导入 Loon 配置
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- macOS 教程 -->
+          <div x-show="activeTab === 'macos'" class="space-y-6" x-transition>
+            <!-- Clash Verge -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div>
+                <h4 class="text-sm font-semibold text-white flex items-center">
+                  Clash Verge <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">完美适配</span>
+                </h4>
+                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                  在 macOS 平台完美运行的现代桌面程序，极致省能且全面契合系统原生视窗体验。
+                </p>
+                <a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" class="text-[10px] text-slate-500 hover:text-indigo-400 mt-2.5 inline-flex items-center transition">
+                  <i class="fa-solid fa-arrow-down-to-bracket mr-1"></i>前往官方 GitHub 下载
+                </a>
+              </div>
+              <button @click="importClash" class="bg-gradient-to-r from-indigo-500 to-pink-500 text-white rounded-xl py-3 px-5 text-xs font-semibold hover:brightness-110 active:scale-[0.98] transition flex items-center justify-center whitespace-nowrap">
+                <i class="fa-solid fa-bolt mr-1.5 animate-pulse"></i>一键导入 Clash
+              </button>
+            </div>
+
+            <!-- sing-box -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div>
+                <h4 class="text-sm font-semibold text-white">sing-box for macOS</h4>
+                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                  基于原生 SwiftUI 构建的 sing-box 客户端，深度调和原生网卡代理，无感轻灵。
+                </p>
+              </div>
+              <button @click="importSingBox" class="bg-slate-950 border border-slate-800 text-indigo-400 hover:border-indigo-500/50 hover:text-white rounded-xl py-3 px-5 text-xs font-semibold active:scale-[0.98] transition flex items-center justify-center whitespace-nowrap">
+                <i class="fa-solid fa-bolt mr-1.5"></i>一键导入 sing-box
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </main>
 
   <script src="/assets/js/api.js"></script>
@@ -194,6 +399,27 @@
         totalStr: '0 B',
         usagePercentage: 0,
         announcements: [],
+
+        // 订阅与测速核心数据结构
+        appName: 'SPanel',
+        subDomainsList: [],
+        selectedDomain: '',
+        subToken: '',
+        latencies: {},
+        activeTab: 'windows',
+        speedTestLoading: false,
+
+        // 动态计算出最终的订阅链接与二维码链接
+        get activeSubLink() {
+          if (!this.selectedDomain || !this.subToken) return '';
+          return `${this.selectedDomain}/link/${this.subToken}`;
+        },
+
+        get qrCodeUrl() {
+          const link = this.activeSubLink;
+          if (!link) return '';
+          return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(link)}`;
+        },
 
         async init() {
           const storedUser = localStorage.getItem('spanel_user');
@@ -217,6 +443,24 @@
             this.lastCheckinTime = data.checkin_status.last_checkin_time || '从未签到';
             this.announcements = data.announcements || [];
 
+            // 订阅中心配置绑定
+            this.appName = data.appName || 'SPanel';
+            this.subToken = data.token || '';
+            
+            // 多域名分发逻辑
+            const domains = data.sub_domains || [];
+            if (domains.length === 0) {
+              domains.push(window.location.origin);
+            }
+            this.subDomainsList = domains;
+            
+            if (!this.selectedDomain && domains.length > 0) {
+              this.selectedDomain = domains[0];
+            }
+
+            // 发起异步订阅域名测速
+            this.startSpeedTest();
+
             // 流量显示逻辑封装
             const u = BigInt(data.u);
             const d = BigInt(data.d);
@@ -238,6 +482,102 @@
           }
         },
 
+        async startSpeedTest() {
+          if (this.speedTestLoading) return;
+          this.speedTestLoading = true;
+          
+          this.subDomainsList.forEach(domain => {
+            this.latencies[domain] = 'testing';
+          });
+          
+          const promises = this.subDomainsList.map(async (domain) => {
+            const start = Date.now();
+            try {
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 2000);
+              
+              await fetch(`${domain}/api/health`, {
+                method: 'GET',
+                signal: controller.signal,
+                mode: 'cors',
+                credentials: 'omit'
+              });
+              
+              clearTimeout(timeoutId);
+              this.latencies[domain] = Date.now() - start;
+            } catch (err) {
+              this.latencies[domain] = 'timeout';
+            }
+          });
+          
+          await Promise.all(promises);
+          this.speedTestLoading = false;
+          
+          // 挑选延迟最低的可用域名设为默认
+          let fastest = '';
+          let minLatency = 99999;
+          this.subDomainsList.forEach(domain => {
+            const lat = this.latencies[domain];
+            if (typeof lat === 'number' && lat < minLatency) {
+              minLatency = lat;
+              fastest = domain;
+            }
+          });
+          
+          if (fastest) {
+            this.selectedDomain = fastest;
+          }
+        },
+
+        selectDomain(domain) {
+          this.selectedDomain = domain;
+        },
+
+        async copyActiveSubLink() {
+          try {
+            await navigator.clipboard.writeText(this.activeSubLink);
+            alert('通用订阅链接已复制到您的剪贴板，快去客户端导入吧！');
+          } catch(e) {
+            alert('复制失败：' + e.message);
+          }
+        },
+
+        importClash() {
+          const url = encodeURIComponent(this.activeSubLink);
+          const name = encodeURIComponent(this.appName);
+          window.location.href = `clash://install-config?url=${url}&name=${name}`;
+        },
+
+        importSingBox() {
+          const url = encodeURIComponent(this.activeSubLink);
+          const name = encodeURIComponent(this.appName);
+          window.location.href = `sing-box://import-remote-profile?url=${url}#${name}`;
+        },
+
+        importShadowrocket() {
+          const url = this.activeSubLink;
+          const name = encodeURIComponent(this.appName);
+          // 使用标准 Base64 编码以适配 shadowrocket 订阅结构
+          const b64 = btoa(url).replace(/=/g, '');
+          window.location.href = `shadowrocket://add/sub://${b64}?remarks=${name}`;
+        },
+
+        importSurfboard() {
+          const url = encodeURIComponent(this.activeSubLink);
+          window.location.href = `surfboard:///install-config?url=${url}`;
+        },
+
+        importQuanX() {
+          const url = encodeURIComponent(this.activeSubLink);
+          const configJson = JSON.stringify({ server_link: this.activeSubLink });
+          window.location.href = `quantumult-x:///update-configuration?remote-resource=${encodeURIComponent(configJson)}`;
+        },
+
+        importLoon() {
+          const url = encodeURIComponent(this.activeSubLink);
+          window.location.href = `loon://import?config=${url}`;
+        },
+
         async doCheckin() {
           this.checkinLoading = true;
           try {
@@ -248,19 +588,6 @@
             alert(err.message || '签到失败，请稍后再试。');
           } finally {
             this.checkinLoading = false;
-          }
-        },
-
-        async copySubLink() {
-          // 订阅 Token 通用获取
-          try {
-            const profile = await SPanelAPI.request('/user/profile');
-            const token = profile.data.passwd; // 使用 passwd 字段作为订阅 token (对齐 legacy schema)
-            const subLink = `${window.location.origin}/link/${token}`;
-            await navigator.clipboard.writeText(subLink);
-            alert('通用订阅链接已复制到您的剪贴板，快去客户端导入吧！');
-          } catch(e) {
-            alert('读取账户 Token 失败：' + e.message);
           }
         },
 

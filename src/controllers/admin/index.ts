@@ -9,6 +9,7 @@ import { adminCouponController } from './coupon';
 import { adminCodeController } from './code';
 import { adminInviteController } from './invite';
 import { adminAuditController } from './audit';
+import { adminSettingsController } from './settings';
 
 export const adminController = new Elysia({ prefix: '/api/v1' })
   .use(adminDashboardController)
@@ -20,5 +21,7 @@ export const adminController = new Elysia({ prefix: '/api/v1' })
   .use(adminCouponController)
   .use(adminCodeController)
   .use(adminInviteController)
-  .use(adminAuditController);
+  .use(adminAuditController)
+  .use(adminSettingsController);
+
 
