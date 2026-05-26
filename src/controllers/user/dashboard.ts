@@ -3,6 +3,8 @@ import { db } from '../../config/database';
 import { userTable, announcementTable } from '../../db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { authDerive, requireAuth } from '../../middleware/auth';
+import { getConfig } from '../../config/app';
+
 
 export const userDashboardController = new Elysia({ prefix: '/user' })
   .derive(authDerive)
@@ -42,6 +44,12 @@ export const userDashboardController = new Elysia({ prefix: '/user' })
       lastCheckinStr = lastDate.toISOString().replace('T', ' ').substring(0, 19);
     }
 
+    const appName = getConfig('appName', 'SPanel-bun 代理中心');
+    const subDomainsRaw = getConfig('subDomains', '');
+    const sub_domains = subDomainsRaw
+      ? subDomainsRaw.split(',').map(d => d.trim()).filter(Boolean)
+      : [];
+
     return {
       status: 'success',
       data: {
@@ -61,7 +69,10 @@ export const userDashboardController = new Elysia({ prefix: '/user' })
           date: ann.date ? ann.date.toISOString().replace('T', ' ').substring(0, 19) : '',
           content: ann.content,
           markdown: ann.markdown
-        }))
+        })),
+        appName,
+        sub_domains,
+        token: user.passwd
       }
     };
   })
