@@ -20,6 +20,13 @@ export const authController = new Elysia({ prefix: '/api/v1/auth' })
       };
     }
 
+    if (provider === 'none') {
+      return {
+        status: 'success',
+        captcha_provider: 'none',
+      };
+    }
+
     const captcha = svgCaptcha.create({
       size: 4,
       ignoreChars: '0o1i',

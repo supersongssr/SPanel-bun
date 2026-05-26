@@ -24,6 +24,8 @@ export async function handlePowRequest(body: any) {
     if (!isValid) {
       throw new Error('极验人机校验未通过，请重新进行滑块校验。');
     }
+  } else if (provider === 'none') {
+    // 验证码提供商为 none，跳过校验，用于黑盒测试/调试环境
   } else {
     const { captchaId, captchaCode } = body;
     if (!captchaId || !captchaCode) {
