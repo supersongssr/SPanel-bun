@@ -34,21 +34,23 @@
 <body class="min-h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black text-slate-100 pb-12" x-data="dashboardPage()">
   
   <!-- 顶部导航栏 -->
-  <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+  <nav x-data="{ mobileMenuOpen: false }" class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-3 flex-shrink-0">
           <a href="/user/dashboard.html" class="font-outfit text-2xl font-bold bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent">SPanel</a>
           <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-semibold border border-indigo-500/20">Member</span>
         </div>
-        <div class="flex items-center space-x-6 text-sm overflow-x-auto scrollbar-none">
-          <a href="/user/dashboard.html" class="text-indigo-400 hover:text-indigo-300 transition font-medium whitespace-nowrap"><i class="fa-solid fa-chart-line mr-1.5"></i>控制台</a>
-          <a href="/user/nodes.html" class="text-slate-400 hover:text-indigo-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-server mr-1.5"></i>节点列表</a>
-          <a href="/user/relay.html" class="text-slate-400 hover:text-indigo-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-route mr-1.5"></i>中转规则</a>
-          <a href="/user/shop.html" class="text-slate-400 hover:text-indigo-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-store mr-1.5"></i>套餐商店</a>
-          <a href="/user/code.html" class="text-slate-400 hover:text-indigo-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-credit-card mr-1.5"></i>卡密充值</a>
-          <a href="/user/invite.html" class="text-slate-400 hover:text-indigo-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-gift mr-1.5"></i>推广联盟</a>
-          <a href="/user/tickets.html" class="text-slate-400 hover:text-indigo-400 transition font-medium whitespace-nowrap"><i class="fa-solid fa-ticket mr-1.5"></i>工单支持</a>
+        
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center space-x-6 text-sm">
+          <a href="/user/dashboard.html" class="transition font-medium whitespace-nowrap" :class="location.pathname.endsWith('/dashboard.html') ? 'text-indigo-400 hover:text-indigo-300' : 'text-slate-400 hover:text-indigo-400'"><i class="fa-solid fa-chart-line mr-1.5"></i>控制台</a>
+          <a href="/user/nodes.html" class="transition font-medium whitespace-nowrap" :class="location.pathname.endsWith('/nodes.html') ? 'text-indigo-400 hover:text-indigo-300' : 'text-slate-400 hover:text-indigo-400'"><i class="fa-solid fa-server mr-1.5"></i>节点列表</a>
+          <a href="/user/relay.html" class="transition font-medium whitespace-nowrap" :class="location.pathname.endsWith('/relay.html') ? 'text-indigo-400 hover:text-indigo-300' : 'text-slate-400 hover:text-indigo-400'"><i class="fa-solid fa-route mr-1.5"></i>中转规则</a>
+          <a href="/user/shop.html" class="transition font-medium whitespace-nowrap" :class="location.pathname.endsWith('/shop.html') ? 'text-indigo-400 hover:text-indigo-300' : 'text-slate-400 hover:text-indigo-400'"><i class="fa-solid fa-store mr-1.5"></i>套餐商店</a>
+          <a href="/user/code.html" class="transition font-medium whitespace-nowrap" :class="location.pathname.endsWith('/code.html') ? 'text-indigo-400 hover:text-indigo-300' : 'text-slate-400 hover:text-indigo-400'"><i class="fa-solid fa-credit-card mr-1.5"></i>卡密充值</a>
+          <a href="/user/invite.html" class="transition font-medium whitespace-nowrap" :class="location.pathname.endsWith('/invite.html') ? 'text-indigo-400 hover:text-indigo-300' : 'text-slate-400 hover:text-indigo-400'"><i class="fa-solid fa-gift mr-1.5"></i>推广联盟</a>
+          <a href="/user/tickets.html" class="transition font-medium whitespace-nowrap" :class="location.pathname.includes('/ticket') ? 'text-indigo-400 hover:text-indigo-300' : 'text-slate-400 hover:text-indigo-400'"><i class="fa-solid fa-ticket mr-1.5"></i>工单支持</a>
           
           <!-- 用户下拉子菜单 -->
           <div class="relative" x-data="{ open: false }" @click.away="open = false">
@@ -58,12 +60,43 @@
             <div class="absolute right-0 mt-2 w-40 rounded-xl bg-slate-900 border border-slate-800 shadow-xl py-1 z-50" x-show="open" x-transition>
               <a href="/user/profile.html" class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 transition"><i class="fa-solid fa-user mr-2"></i>个人中心</a>
               <a href="/user/edit.html" class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 transition"><i class="fa-solid fa-shield-halved mr-2"></i>安全设置</a>
+              <template x-if="JSON.parse(localStorage.getItem('spanel_user') || '{}').isAdmin">
+                <a href="/admin/dashboard.html" class="block px-4 py-2 text-xs text-indigo-400 hover:bg-slate-800 transition"><i class="fa-solid fa-user-shield mr-2"></i>管理后台</a>
+              </template>
               <hr class="border-slate-800 my-1">
               <button @click="logout" class="w-full text-left px-4 py-2 text-xs text-rose-400 hover:bg-rose-950/20 transition"><i class="fa-solid fa-right-from-bracket mr-2"></i>退出登录</button>
             </div>
           </div>
         </div>
+
+        <!-- Mobile Hamburger Button -->
+        <div class="flex items-center md:hidden">
+          <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-slate-400 hover:text-white focus:outline-none p-2 rounded-lg bg-slate-900 border border-slate-800">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div x-show="mobileMenuOpen" x-transition class="md:hidden border-t border-slate-800 bg-slate-950 px-4 py-3 space-y-2">
+      <a href="/user/dashboard.html" class="block px-3 py-2 rounded-xl text-base font-medium transition" :class="location.pathname.endsWith('/dashboard.html') ? 'bg-indigo-500/10 text-indigo-400' : 'text-slate-400 hover:bg-slate-900 hover:text-indigo-400'"><i class="fa-solid fa-chart-line mr-2"></i>控制台</a>
+      <a href="/user/nodes.html" class="block px-3 py-2 rounded-xl text-base font-medium transition" :class="location.pathname.endsWith('/nodes.html') ? 'bg-indigo-500/10 text-indigo-400' : 'text-slate-400 hover:bg-slate-900 hover:text-indigo-400'"><i class="fa-solid fa-server mr-2"></i>节点列表</a>
+      <a href="/user/relay.html" class="block px-3 py-2 rounded-xl text-base font-medium transition" :class="location.pathname.endsWith('/relay.html') ? 'bg-indigo-500/10 text-indigo-400' : 'text-slate-400 hover:bg-slate-900 hover:text-indigo-400'"><i class="fa-solid fa-route mr-2"></i>中转规则</a>
+      <a href="/user/shop.html" class="block px-3 py-2 rounded-xl text-base font-medium transition" :class="location.pathname.endsWith('/shop.html') ? 'bg-indigo-500/10 text-indigo-400' : 'text-slate-400 hover:bg-slate-900 hover:text-indigo-400'"><i class="fa-solid fa-store mr-2"></i>套餐商店</a>
+      <a href="/user/code.html" class="block px-3 py-2 rounded-xl text-base font-medium transition" :class="location.pathname.endsWith('/code.html') ? 'bg-indigo-500/10 text-indigo-400' : 'text-slate-400 hover:bg-slate-900 hover:text-indigo-400'"><i class="fa-solid fa-credit-card mr-2"></i>卡密充值</a>
+      <a href="/user/invite.html" class="block px-3 py-2 rounded-xl text-base font-medium transition" :class="location.pathname.endsWith('/invite.html') ? 'bg-indigo-500/10 text-indigo-400' : 'text-slate-400 hover:bg-slate-900 hover:text-indigo-400'"><i class="fa-solid fa-gift mr-2"></i>推广联盟</a>
+      <a href="/user/tickets.html" class="block px-3 py-2 rounded-xl text-base font-medium transition" :class="location.pathname.includes('/ticket') ? 'bg-indigo-500/10 text-indigo-400' : 'text-slate-400 hover:bg-slate-900 hover:text-indigo-400'"><i class="fa-solid fa-ticket mr-2"></i>工单支持</a>
+      <hr class="border-slate-800 my-2">
+      <a href="/user/profile.html" class="block px-3 py-2 rounded-xl text-base font-medium text-slate-400 hover:bg-slate-900 hover:text-indigo-400 transition"><i class="fa-solid fa-user mr-2"></i>个人中心</a>
+      <a href="/user/edit.html" class="block px-3 py-2 rounded-xl text-base font-medium text-slate-400 hover:bg-slate-900 hover:text-indigo-400 transition"><i class="fa-solid fa-shield-halved mr-2"></i>安全设置</a>
+      <template x-if="JSON.parse(localStorage.getItem('spanel_user') || '{}').isAdmin">
+        <a href="/admin/dashboard.html" class="block px-3 py-2 rounded-xl text-base font-medium text-indigo-400 hover:bg-slate-900 transition"><i class="fa-solid fa-user-shield mr-2"></i>管理后台</a>
+      </template>
+      <button @click="logout" class="w-full text-left px-3 py-2 rounded-xl text-base font-medium text-rose-400 hover:bg-rose-950/20 transition"><i class="fa-solid fa-right-from-bracket mr-2"></i>退出登录</button>
     </div>
   </nav>
 
@@ -215,18 +248,24 @@
           </h3>
           
           <!-- 系统 Tab 切换栏 -->
-          <div class="flex items-center space-x-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800 max-w-sm mb-6">
-            <button @click="activeTab = 'windows'" :class="activeTab === 'windows' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="flex-1 py-2 text-xs rounded-lg transition flex items-center justify-center">
+          <div class="flex flex-wrap items-center gap-1.5 bg-slate-900 p-1.5 rounded-2xl border border-slate-800 mb-6">
+            <button @click="activeTab = 'windows'" :class="activeTab === 'windows' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="px-4 py-2 text-xs rounded-xl transition flex items-center justify-center whitespace-nowrap">
               <i class="fa-brands fa-windows mr-1.5"></i>Windows
             </button>
-            <button @click="activeTab = 'android'" :class="activeTab === 'android' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="flex-1 py-2 text-xs rounded-lg transition flex items-center justify-center">
+            <button @click="activeTab = 'android'" :class="activeTab === 'android' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="px-4 py-2 text-xs rounded-xl transition flex items-center justify-center whitespace-nowrap">
               <i class="fa-brands fa-android mr-1.5"></i>Android
             </button>
-            <button @click="activeTab = 'ios'" :class="activeTab === 'ios' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="flex-1 py-2 text-xs rounded-lg transition flex items-center justify-center">
+            <button @click="activeTab = 'ios'" :class="activeTab === 'ios' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="px-4 py-2 text-xs rounded-xl transition flex items-center justify-center whitespace-nowrap">
               <i class="fa-brands fa-apple mr-1"></i>iOS
             </button>
-            <button @click="activeTab = 'macos'" :class="activeTab === 'macos' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="flex-1 py-2 text-xs rounded-lg transition flex items-center justify-center">
+            <button @click="activeTab = 'macos'" :class="activeTab === 'macos' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="px-4 py-2 text-xs rounded-xl transition flex items-center justify-center whitespace-nowrap">
               <i class="fa-brands fa-apple mr-1"></i>macOS
+            </button>
+            <button @click="activeTab = 'linux'" :class="activeTab === 'linux' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="px-4 py-2 text-xs rounded-xl transition flex items-center justify-center whitespace-nowrap">
+              <i class="fa-solid fa-terminal mr-1.5"></i>Linux
+            </button>
+            <button @click="activeTab = 'router'" :class="activeTab === 'router' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold' : 'text-slate-400 hover:text-slate-200 border border-transparent'" class="px-4 py-2 text-xs rounded-xl transition flex items-center justify-center whitespace-nowrap">
+              <i class="fa-solid fa-router mr-1.5"></i>Router 路由器
             </button>
           </div>
 
@@ -234,14 +273,14 @@
           <div x-show="activeTab === 'windows'" class="space-y-6" x-transition>
             <!-- Clash Verge -->
             <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-              <div>
+              <div class="flex-1 pr-4">
                 <h4 class="text-sm font-semibold text-white flex items-center">
                   Clash Verge <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">极力推荐</span>
                 </h4>
-                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
                   基于 Meta 核心的现代开源客户端，界面极速美观，自带完美中文，性能绝佳。
                 </p>
-                <a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" class="text-[10px] text-slate-500 hover:text-indigo-400 mt-2.5 inline-flex items-center transition">
+                <a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" class="text-[10px] text-indigo-400 hover:text-indigo-300 mt-2.5 inline-flex items-center transition">
                   <i class="fa-solid fa-arrow-down-to-bracket mr-1"></i>前往 GitHub 官方下载页面
                 </a>
               </div>
@@ -250,11 +289,33 @@
               </button>
             </div>
 
+            <!-- v2rayN Desktop -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div class="flex-1 pr-4">
+                <h4 class="text-sm font-semibold text-white flex items-center">
+                  v2rayN <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">经典好用</span>
+                </h4>
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
+                  经典且强大的 Windows 代理客户端，完美支持 V2Ray / Xray / Trojan / Shadowsocks 等所有主流混淆协议。
+                </p>
+                <a href="/download/v2rayN-windows-64-desktop.zip" download class="text-[10px] text-indigo-400 hover:text-indigo-300 mt-2.5 inline-flex items-center transition font-semibold">
+                  <i class="fa-solid fa-cloud-arrow-down mr-1"></i>官方内置渠道极速下载 (.zip)
+                </a>
+                <div class="text-[10px] text-slate-500 mt-3 space-y-1.5">
+                  <p>1. 下载并完整解压软件包，双击文件夹内的 <code>v2rayN.exe</code> 运行。</p>
+                  <p>2. 在上方菜单点击 <code>订阅分组</code> -> <code>订阅分组设置</code> -> 点击 <code>添加</code>。</p>
+                  <p>3. 别名随意填写，地址粘贴复制好的通用订阅链接，勾选 <code>启用订阅</code> 并保存。</p>
+                  <p>4. 返回主界面，点击 <code>订阅分组</code> -> <code>更新当前订阅(不通过代理)</code> 获取节点列表。</p>
+                  <p>5. 选中节点右键 <code>设为活动服务器</code>，并在底部状态栏将 <code>系统代理</code> 设为 <code>自动配置系统代理</code> 即可。</p>
+                </div>
+              </div>
+            </div>
+
             <!-- sing-box -->
             <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-              <div>
+              <div class="flex-1 pr-4">
                 <h4 class="text-sm font-semibold text-white">sing-box</h4>
-                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
                   新一代通用规则代理核心客户端，资源占用极小，具有超轻量、低延迟和强大的解析协议支持。
                 </p>
               </div>
@@ -268,14 +329,14 @@
           <div x-show="activeTab === 'android'" class="space-y-6" x-transition>
             <!-- Surfboard -->
             <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-              <div>
+              <div class="flex-1 pr-4">
                 <h4 class="text-sm font-semibold text-white flex items-center">
                   Surfboard 冲浪板 <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">推荐使用</span>
                 </h4>
-                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
                   专为安卓深度定制的现代客户端，完美融入系统底层，图表流畅直观，极度省电。
                 </p>
-                <a href="https://github.com/getsurfboard/surfboard/releases" target="_blank" class="text-[10px] text-slate-500 hover:text-indigo-400 mt-2.5 inline-flex items-center transition">
+                <a href="https://github.com/getsurfboard/surfboard/releases" target="_blank" class="text-[10px] text-indigo-400 hover:text-indigo-300 mt-2.5 inline-flex items-center transition">
                   <i class="fa-solid fa-arrow-down-to-bracket mr-1"></i>前往官方发行版本下载
                 </a>
               </div>
@@ -284,11 +345,33 @@
               </button>
             </div>
 
+            <!-- v2rayNG Android -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div class="flex-1 pr-4">
+                <h4 class="text-sm font-semibold text-white flex items-center">
+                  v2rayNG <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">极简高效</span>
+                </h4>
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
+                  安卓端使用最为广泛的客户端，界面简单直观，适配多种复杂的底层数据混淆传输方式。
+                </p>
+                <a href="/download/v2rayNG_arm64-v8a.apk" download class="text-[10px] text-indigo-400 hover:text-indigo-300 mt-2.5 inline-flex items-center transition font-semibold">
+                  <i class="fa-solid fa-cloud-arrow-down mr-1"></i>官方内置渠道极速下载 (.apk)
+                </a>
+                <div class="text-[10px] text-slate-500 mt-3 space-y-1.5">
+                  <p>1. 下载并安装 APK 客户端文件，打开 v2rayNG。</p>
+                  <p>2. 点击左上角三横菜单 -> 进入 <code>订阅设置</code> -> 点击右上角 <code>+</code> 添加。</p>
+                  <p>3. 备注名随意写，地址粘贴复制好的订阅链接，保存并返回主界面。</p>
+                  <p>4. 点击右上角三个点菜单 -> <code>更新订阅</code> 获取物理节点列表。</p>
+                  <p>5. 任意点击选中一台合适的节点服务器，点击右下角圆形的 <code>V</code> 启动图标即可开启代理。</p>
+                </div>
+              </div>
+            </div>
+
             <!-- Clash Meta -->
             <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-              <div>
+              <div class="flex-1 pr-4">
                 <h4 class="text-sm font-semibold text-white">Clash for Android</h4>
-                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
                   经典且使用人数最广泛的 Clash 核心 Android 应用，支持分应用代理和强大规则集分流。
                 </p>
               </div>
@@ -302,11 +385,11 @@
           <div x-show="activeTab === 'ios'" class="space-y-6" x-transition>
             <!-- Shadowrocket -->
             <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-              <div>
+              <div class="flex-1 pr-4">
                 <h4 class="text-sm font-semibold text-white flex items-center">
                   Shadowrocket 小火箭 <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">极力推荐</span>
                 </h4>
-                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
                   iOS 平台绝对的首选客户端，功能强大无出其右。支持所有代理协议，且一键订阅极为稳定。<br>
                   <span class="text-[10px] text-amber-500"><i class="fa-solid fa-triangle-exclamation mr-1"></i>需使用美区/非中国大陆 Apple ID 在 App Store 购买下载。</span>
                 </p>
@@ -316,12 +399,36 @@
               </button>
             </div>
 
+            <!-- Sing-Box Free iOS -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div class="flex-1 pr-4">
+                <h4 class="text-sm font-semibold text-white flex items-center">
+                  sing-box for iOS <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">完全免费</span>
+                </h4>
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
+                  开源核心，免费无广告，轻量省电。可以在非中国区 App Store 免费搜索并安装。<br>
+                </p>
+                <a href="https://apps.apple.com/us/app/sing-box-vt/id6673731168" target="_blank" class="text-[10px] text-indigo-400 hover:text-indigo-300 mt-2.5 inline-flex items-center transition">
+                  <i class="fa-solid fa-link mr-1"></i>前往 App Store 下载 Sing-Box-VT
+                </a>
+                <div class="text-[10px] text-slate-500 mt-3 space-y-1.5">
+                  <p>1. 点击上方一键导入或在下方复制 <code>singbox</code> 订阅链接。</p>
+                  <p>2. 打开 Sing-Box 客户端，进入 <code>Profiles</code> -> 点击 <code>New Profile</code>。</p>
+                  <p>3. 设定类型（Type）为 <code>Remote</code>，在 URL 输入框粘贴订阅链接，点击 <code>Create</code> 创建配置文件。</p>
+                  <p>4. 选中刚生成的 Profile，返回 Dashboard 界面开启 <code>Enable</code> 代理开关即可。</p>
+                </div>
+              </div>
+              <button @click="importSingBox" class="bg-slate-950 border border-slate-800 text-indigo-400 hover:border-indigo-500/50 hover:text-white rounded-xl py-3 px-5 text-xs font-semibold active:scale-[0.98] transition flex items-center justify-center whitespace-nowrap">
+                <i class="fa-solid fa-bolt mr-1.5"></i>一键导入 sing-box
+              </button>
+            </div>
+
             <!-- Quantumult X & Loon -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="bg-slate-900/40 border border-slate-800/80 p-4 rounded-2xl flex flex-col justify-between">
                 <div>
                   <h4 class="text-xs font-semibold text-white">Quantumult X (圈X)</h4>
-                  <p class="text-slate-450 text-[10px] mt-1.5 leading-relaxed">
+                  <p class="text-slate-400 text-[10px] mt-1.5 leading-relaxed">
                     专为极客打造的高定制代理工具，UI极其精致，支持强大的 JS 脚本重写及分流。
                   </p>
                 </div>
@@ -333,7 +440,7 @@
               <div class="bg-slate-900/40 border border-slate-800/80 p-4 rounded-2xl flex flex-col justify-between">
                 <div>
                   <h4 class="text-xs font-semibold text-white">Loon</h4>
-                  <p class="text-slate-450 text-[10px] mt-1.5 leading-relaxed">
+                  <p class="text-slate-400 text-[10px] mt-1.5 leading-relaxed">
                     兼具界面易用性与丰富扩展脚本功能的 iOS 代理客户端，适合各类中高级玩家。
                   </p>
                 </div>
@@ -348,14 +455,14 @@
           <div x-show="activeTab === 'macos'" class="space-y-6" x-transition>
             <!-- Clash Verge -->
             <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-              <div>
+              <div class="flex-1 pr-4">
                 <h4 class="text-sm font-semibold text-white flex items-center">
                   Clash Verge <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">完美适配</span>
                 </h4>
-                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
                   在 macOS 平台完美运行的现代桌面程序，极致省能且全面契合系统原生视窗体验。
                 </p>
-                <a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" class="text-[10px] text-slate-500 hover:text-indigo-400 mt-2.5 inline-flex items-center transition">
+                <a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" class="text-[10px] text-indigo-400 hover:text-indigo-300 mt-2.5 inline-flex items-center transition">
                   <i class="fa-solid fa-arrow-down-to-bracket mr-1"></i>前往官方 GitHub 下载
                 </a>
               </div>
@@ -364,17 +471,115 @@
               </button>
             </div>
 
+            <!-- v2rayN macOS -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div class="flex-1 pr-4">
+                <h4 class="text-sm font-semibold text-white flex items-center">
+                  v2rayN for macOS <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">强悍全协议</span>
+                </h4>
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
+                  经典全能的 v2rayN 移植物，支持 Mac 上各种最新的物理网卡全局混淆分流传输。
+                </p>
+                <div class="flex flex-wrap gap-2.5 mt-2.5">
+                  <a href="/download/v2rayN-macos-64.dmg" download class="text-[10px] text-indigo-400 hover:text-indigo-300 inline-flex items-center transition font-semibold">
+                    <i class="fa-solid fa-download mr-1"></i>下载 Intel 芯片版本 (.dmg)
+                  </a>
+                  <span class="text-slate-700">|</span>
+                  <a href="/download/v2rayN-macos-arm64.dmg" download class="text-[10px] text-indigo-400 hover:text-indigo-300 inline-flex items-center transition font-semibold">
+                    <i class="fa-solid fa-download mr-1"></i>下载 Apple M系列芯片版本 (.dmg)
+                  </a>
+                </div>
+                <div class="text-[10px] text-amber-400 border border-amber-500/20 bg-amber-500/5 p-3 rounded-xl mt-3 space-y-1">
+                  <p class="font-semibold"><i class="fa-solid fa-shield-halved mr-1"></i>系统安全机制提示（若提示文件已损坏或无法运行）：</p>
+                  <p>请打开系统终端应用，运行以下指令解锁未签名安全警告：</p>
+                  <code class="block font-mono bg-slate-950 p-2 rounded text-slate-355 select-all border border-slate-800 mt-1">sudo xattr -cr /Applications/v2rayN.app</code>
+                </div>
+                <div class="text-[10px] text-slate-500 mt-3 space-y-1.5">
+                  <p>1. 安装 DMG 安装包后，复制通用订阅链接，打开 v2rayN 图形界面。</p>
+                  <p>2. 在顶部 <code>配置文件</code> -> <code>从剪切板导入配置文件</code>，并点击确定。</p>
+                  <p>3. 状态栏菜单栏点击 <code>订阅分组</code> -> <code>更新当前订阅</code> 载入全站服务器。</p>
+                  <p>4. 任意选择物理节点设为活动服务器，并在底部菜单开启 <code>自动配置系统代理</code> 即可。</p>
+                </div>
+              </div>
+            </div>
+
             <!-- sing-box -->
             <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-              <div>
+              <div class="flex-1 pr-4">
                 <h4 class="text-sm font-semibold text-white">sing-box for macOS</h4>
-                <p class="text-slate-450 text-[11px] mt-1.5 leading-relaxed">
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
                   基于原生 SwiftUI 构建的 sing-box 客户端，深度调和原生网卡代理，无感轻灵。
                 </p>
               </div>
               <button @click="importSingBox" class="bg-slate-950 border border-slate-800 text-indigo-400 hover:border-indigo-500/50 hover:text-white rounded-xl py-3 px-5 text-xs font-semibold active:scale-[0.98] transition flex items-center justify-center whitespace-nowrap">
                 <i class="fa-solid fa-bolt mr-1.5"></i>一键导入 sing-box
               </button>
+            </div>
+          </div>
+
+          <!-- Linux 教程 -->
+          <div x-show="activeTab === 'linux'" class="space-y-6" x-transition>
+            <!-- v2rayN Linux -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div class="flex-1 pr-4">
+                <h4 class="text-sm font-semibold text-white flex items-center">
+                  v2rayN for Linux <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Ubuntu/Debian 专用</span>
+                </h4>
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
+                  专为 Linux 桌面端开发的原生 GUI 图形化代理核心程序，适配极为简便高效。
+                </p>
+                <a href="/download/v2rayN-linux-64.deb" download class="text-[10px] text-indigo-400 hover:text-indigo-300 mt-2.5 inline-flex items-center transition font-semibold">
+                  <i class="fa-solid fa-cloud-arrow-down mr-1"></i>官方内置渠道极速下载 (.deb)
+                </a>
+                <div class="text-[10px] text-slate-500 mt-3 space-y-1.5">
+                  <p>1. 下载 <code>.deb</code> 软件包，在终端中使用 <code>sudo dpkg -i</code> 或双击软件中心安装。</p>
+                  <p>2. 运行 v2rayN 应用，并添加复制的通用订阅链接至订阅分组中。</p>
+                  <p>3. 更新当前订阅，选中物理加速节点并开启系统代理即可畅享高速体验。</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- v2rayA Linux -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div class="flex-1 pr-4">
+                <h4 class="text-sm font-semibold text-white flex items-center">
+                  v2rayA <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Linux 极客必选</span>
+                </h4>
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
+                  一款非常强悍的 Linux 底层网卡代理管理器。支持开机全局透明代理。使用网页控制台，适配所有发行版。
+                </p>
+                <a href="https://v2raya.org/docs/prologue/installation/redhat/" target="_blank" class="text-[10px] text-indigo-400 hover:text-indigo-300 mt-2.5 inline-flex items-center transition">
+                  <i class="fa-solid fa-link mr-1"></i>前往 v2rayA 官方多架构发行版安装手册
+                </a>
+                <div class="text-[10px] text-slate-500 mt-3 space-y-1.5">
+                  <p>1. 部署完成后，在终端启动服务：<code>sudo systemctl start v2raya.service</code>。</p>
+                  <p>2. 在浏览器内访问：<code>http://127.0.0.1:2017</code>（首次打开需设置管理账号密码）。</p>
+                  <p>3. 点击 <code>导入/Import</code> 按钮，将通用订阅链接粘贴进去并保存更新。</p>
+                  <p>4. 勾选或进入物理服务器节点列表，选择目标加速服务器点击 <code>启动/Start</code> 代理。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Router 教程 -->
+          <div x-show="activeTab === 'router'" class="space-y-6" x-transition>
+            <!-- OpenWrt SSR Plus+ -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div class="flex-1 pr-4">
+                <h4 class="text-sm font-semibold text-white flex items-center">
+                  OpenWrt ShadowsocksR Plus+ / OpenClash <span class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">智能路由器推荐</span>
+                </h4>
+                <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
+                  在软路由或路由器上订阅并连接加速节点，瞬间使局域网内所有连网设备（如电视机、游戏机、智能家居）均具备高速物理代理分流能力。
+                </p>
+                <div class="text-[10px] text-slate-500 mt-3 space-y-1.5">
+                  <p>1. 进入您的 OpenWrt 路由器管理 LuCI 界面。</p>
+                  <p>2. 找到 <code>服务</code> -> <code>ShadowsocksR Plus+</code>（或 <code>OpenClash</code> / <code>v2rayA</code>）菜单项。</p>
+                  <p>3. 导航到 <code>订阅管理</code>，粘贴通用订阅地址，点击保存并立即进行节点强制更新。</p>
+                  <p>4. 节点载入完毕后，在 <code>主服务器</code> 选项框内选择一台延迟较低的物理加速服务器节点。</p>
+                  <p>5. 设置代理模式为 <code>绕过大陆 IP</code>，点击 <code>保存并应用</code> 按钮使路由器即刻接管全网分流。</p>
+                </div>
+              </div>
             </div>
           </div>
 
