@@ -1,0 +1,1 @@
+import"./modulepreload-polyfill-B5Qt9EMX.js";import{v as o,B as t,z as a,E as p,at as s}from"./vue-vendor-k0iSlyGv.js";import{_ as n}from"./_plugin-vue_export-helper-DlAUqK2U.js";const r={class:"node-container"},_=o({__name:"App",setup(m){return(d,e)=>(a(),t("div",r,[...e[0]||(e[0]=[p("h1",null,"节点页面 - 待实现",-1)])]))}}),c=n(_,[["__scopeId","data-v-21be62ad"]]);s(c).mount("#app");

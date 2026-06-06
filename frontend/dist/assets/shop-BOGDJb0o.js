@@ -1,0 +1,1 @@
+import"./modulepreload-polyfill-B5Qt9EMX.js";import{v as o,B as t,z as p,E as s,at as a}from"./vue-vendor-k0iSlyGv.js";import{_ as n}from"./_plugin-vue_export-helper-DlAUqK2U.js";const r={class:"shop-container"},_=o({__name:"App",setup(m){return(i,e)=>(p(),t("div",r,[...e[0]||(e[0]=[s("h1",null,"商店页面 - 待实现",-1)])]))}}),c=n(_,[["__scopeId","data-v-031de713"]]);a(c).mount("#app");

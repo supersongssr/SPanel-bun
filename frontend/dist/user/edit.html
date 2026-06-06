@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- Auth Guard: Auto-redirect to login if not authenticated -->
+    <script>
+    (function() {
+      const token = localStorage.getItem('spanel_jwt_token');
+      const isUserPage = window.location.pathname.includes('/user/');
+      const isAdminPage = window.location.pathname.includes('/admin/');
+      if (!token && (isUserPage || isAdminPage)) {
+        window.location.href = '/auth/login.html';
+      }
+    })();
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修改资料 - SPanel</title>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg">
+
+    <!-- SPanel Material Design CSS -->
+    <link href="/theme/material/css/base.min.css" rel="stylesheet">
+    <link href="/theme/material/css/project.min.css" rel="stylesheet">
+    <link href="/theme/material/css/user.css" rel="stylesheet">
+    <link href="https://fonts.loli.net/css?family=Roboto:300,300italic,400,400italic,500,500italic|Material+Icons" rel="stylesheet">
+
+    <!-- Element Plus -->
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+
+    <!-- SPanel API Client -->
+    <script src="/shared/api.js"></script>
+
+    <style>
+        .form-group-label {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .maxwidth-edit {
+            max-width: 400px;
+        }
+
+        .cardbtn-edit {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .btn-flat {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            padding: 8px 16px;
+        }
+
+        .btn-flat:hover {
+            background: #f5f7fa;
+        }
+
+        .code {
+            background: #f5f7fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+            color: transparent !important;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="page-orange">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          <aside class="sidebar" id="sidebar">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <!-- Logo -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="sidebar-header">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/" class="sidebar-logo">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">language</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span>SPanel</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <!-- Navigation Menu -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <nav class="sidebar-nav">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <ul style="list-style: none; padding: 0; margin: 0;">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <!-- ========================================
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 GROUP: 我的 (Me)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ======================================== -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <li class="menu-group">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="menu-group-title" onclick="toggleMenu('menu-me', this)">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="material-icons">person</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <span>我的</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="material-icons chevron">expand_more</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <ul class="menu-items" id="menu-me">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/index.html" class="menu-item" data-page="dashboard">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">account_balance_wallet</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">用户面板</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/invite.html" class="menu-item" data-page="invite">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">loyalty</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">邀请返利</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <!-- ========================================
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 GROUP: 商店 (Shop)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ======================================== -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <li class="menu-group">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="menu-group-title" onclick="toggleMenu('menu-shop', this)">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="material-icons">shopping_bag</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <span>商店</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="material-icons chevron">expand_more</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <ul class="menu-items" id="menu-shop">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/code.html" class="menu-item" data-page="code">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">code</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">捐赠/充值</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/shop.html" class="menu-item" data-page="shop">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">shop</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">套餐购买</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/bought.html" class="menu-item" data-page="bought">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">shopping_cart</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">购买记录</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <!-- ========================================
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 GROUP: 使用 (Usage)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ======================================== -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <li class="menu-group">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="menu-group-title" onclick="toggleMenu('menu-usage', this)">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="material-icons">settings</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <span>使用</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="material-icons chevron">expand_more</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <ul class="menu-items" id="menu-usage">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/nodes.html" class="menu-item" data-page="nodes">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">airplanemode_active</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">节点列表</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/nodeunlock.html" class="menu-item" data-page="nodeunlock">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">important_devices</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">媒体解锁</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/ticket.html" class="menu-item" data-page="ticket">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">question_answer</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">技术支持</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <!-- ========================================
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 GROUP: 账户 (Account)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ======================================== -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <li class="menu-group">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="menu-group-title" onclick="toggleMenu('menu-account', this)">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="material-icons">account_circle</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <span>账户</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="material-icons chevron">expand_more</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <ul class="menu-items" id="menu-account">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/profile.html" class="menu-item" data-page="profile">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">account_box</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">账户信息</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/edit.html" class="menu-item" data-page="edit">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">sync_problem</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">个人设定</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/announcement.html" class="menu-item" data-page="announcement">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">announcement</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">帮助文档</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/trafficlog.html" class="menu-item" data-page="trafficlog">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">hourglass_empty</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">流量记录</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/detect.html" class="menu-item" data-page="detect">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">account_balance</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">审计规则</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="/user/detect/log.html" class="menu-item" data-page="detectlog">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="material-icons">assignment_late</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <span class="menu-item-text">审计记录</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <!-- Divider -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <li class="menu-divider"></li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <!-- ========================================
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 SPECIAL: Telegram Link (Conditional)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ======================================== -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <li id="telegram-link-container" style="display: none;">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <a href="https://t.me/spanel" target="_blank" class="special-link telegram-link">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="material-icons">near_me</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <span class="menu-item-text">Telegram群组</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <!-- ========================================
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 SPECIAL: Admin Back (Conditional)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ======================================== -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <li id="admin-back-container" style="display: none;">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <a href="/admin/index.html" class="special-link admin-link">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="material-icons">admin_panel_settings</i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <span class="menu-item-text">返回管理员身份</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </nav>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                </aside>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                <!-- Global Navigation Sync Script -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                <script>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        'use strict';
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // Auto-highlight active menu item based on current URL
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        function highlightActiveMenuItem() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            const currentPath = window.location.pathname;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // Remove active class from all menu items
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            document.querySelectorAll('.menu-item').forEach(item => {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                item.classList.remove('active');
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            });
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // Find matching menu item
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            let activeItem = null;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // Exact match first
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            activeItem = document.querySelector(`.menu-item[href="${currentPath}"]`);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // If no exact match, try page name matching
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            if (!activeItem) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                const pageName = currentPath.split('/').pop()?.replace('.html', '') || '';
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                if (pageName) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    activeItem = document.querySelector(`.menu-item[data-page="${pageName}"]`);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // If still no match, try partial match
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            if (!activeItem && currentPath.includes('/user/')) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                const segments = currentPath.split('/');
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                const lastSegment = segments[segments.length - 1];
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                if (lastSegment) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    const pagePart = lastSegment.replace('.html', '').replace(/-/g, '');
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    document.querySelectorAll('.menu-item').forEach(item => {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const href = item.getAttribute('href') || '';
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const hrefPage = href.split('/').pop()?.replace('.html', '').replace(/-/g, '') || '';
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        if (hrefPage && lastSegment.includes(hrefPage) || pageName.includes(hrefPage)) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            activeItem = item;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // Add active class to found item
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            if (activeItem) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                activeItem.classList.add('active');
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                // Expand parent menu group
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                const parentGroup = activeItem.closest('.menu-group');
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                if (parentGroup) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    parentGroup.classList.add('expanded');
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // Run on page load
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        if (document.readyState === 'loading') {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            document.addEventListener('DOMContentLoaded', highlightActiveMenuItem);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } else {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            highlightActiveMenuItem();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    })();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                </script>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                <!-- Global Navigation Sync Script -->
+                                                                                                                                                                                                                                <script>
+                                                                                                                                                                                                                                    (function() {
+                                                                                                                                                                                                                                        'use strict';
+                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                        // Auto-highlight active menu item based on current URL
+                                                                                                                                                                                                                                        function highlightActiveMenuItem() {
+                                                                                                                                                                                                                                            const currentPath = window.location.pathname;
+                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                            // Remove active class from all menu items
+                                                                                                                                                                                                                                            document.querySelectorAll('.menu-item').forEach(item => {
+                                                                                                                                                                                                                                                item.classList.remove('active');
+                                                                                                                                                                                                                                            });
+                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                            // Find matching menu item
+                                                                                                                                                                                                                                            let activeItem = null;
+                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                            // Exact match first
+                                                                                                                                                                                                                                            activeItem = document.querySelector(`.menu-item[href="${currentPath}"]`);
+                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                            // If no exact match, try page name matching
+                                                                                                                                                                                                                                            if (!activeItem) {
+                                                                                                                                                                                                                                                const pageName = currentPath.split('/').pop()?.replace('.html', '') || '';
+                                                                                                                                                                                                                                                if (pageName) {
+                                                                                                                                                                                                                                                    activeItem = document.querySelector(`.menu-item[data-page="${pageName}"]`);
+                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                            // If still no match, try partial match
+                                                                                                                                                                                                                                            if (!activeItem && currentPath.includes('/user/')) {
+                                                                                                                                                                                                                                                const segments = currentPath.split('/');
+                                                                                                                                                                                                                                                const lastSegment = segments[segments.length - 1];
+                                                                                                                                                                                                                                                if (lastSegment) {
+                                                                                                                                                                                                                                                    const pagePart = lastSegment.replace('.html', '').replace(/-/g, '');
+                                                                                                                                                                                                                                                    document.querySelectorAll('.menu-item').forEach(item => {
+                                                                                                                                                                                                                                                        const href = item.getAttribute('href') || '';
+                                                                                                                                                                                                                                                        const hrefPage = href.split('/').pop()?.replace('.html', '').replace(/-/g, '') || '';
+                                                                                                                                                                                                                                                        if (hrefPage && lastSegment.includes(hrefPage) || pageName.includes(hrefPage)) {
+                                                                                                                                                                                                                                                            activeItem = item;
+                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                            // Add active class to found item
+                                                                                                                                                                                                                                            if (activeItem) {
+                                                                                                                                                                                                                                                activeItem.classList.add('active');
+                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                // Expand parent menu group
+                                                                                                                                                                                                                                                const parentGroup = activeItem.closest('.menu-group');
+                                                                                                                                                                                                                                                if (parentGroup) {
+                                                                                                                                                                                                                                                    parentGroup.classList.add('expanded');
+                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                        // Run on page load
+                                                                                                                                                                                                                                        if (document.readyState === 'loading') {
+                                                                                                                                                                                                                                            document.addEventListener('DOMContentLoaded', highlightActiveMenuItem);
+                                                                                                                                                                                                                                        } else {
+                                                                                                                                                                                                                                            highlightActiveMenuItem();
+                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                    })();
+                                                                                                                                                                                                                                </script>
+                                                                                                                                                                                                                            
+                                                                                                            
+                                                                                                                <!-- Global Navigation Sync Script -->
+                                                                                                                <script>
+                                                                                                                    (function() {
+                                                                                                                        'use strict';
+                                                                                                            
+                                                                                                                        // Auto-highlight active menu item based on current URL
+                                                                                                                        function highlightActiveMenuItem() {
+                                                                                                                            const currentPath = window.location.pathname;
+                                                                                                            
+                                                                                                                            // Remove active class from all menu items
+                                                                                                                            document.querySelectorAll('.menu-item').forEach(item => {
+                                                                                                                                item.classList.remove('active');
+                                                                                                                            });
+                                                                                                            
+                                                                                                                            // Find matching menu item
+                                                                                                                            let activeItem = null;
+                                                                                                            
+                                                                                                                            // Exact match first
+                                                                                                                            activeItem = document.querySelector(`.menu-item[href="${currentPath}"]`);
+                                                                                                            
+                                                                                                                            // If no exact match, try page name matching
+                                                                                                                            if (!activeItem) {
+                                                                                                                                const pageName = currentPath.split('/').pop()?.replace('.html', '') || '';
+                                                                                                                                if (pageName) {
+                                                                                                                                    activeItem = document.querySelector(`.menu-item[data-page="${pageName}"]`);
+                                                                                                                                }
+                                                                                                                            }
+                                                                                                            
+                                                                                                                            // If still no match, try partial match
+                                                                                                                            if (!activeItem && currentPath.includes('/user/')) {
+                                                                                                                                const segments = currentPath.split('/');
+                                                                                                                                const lastSegment = segments[segments.length - 1];
+                                                                                                                                if (lastSegment) {
+                                                                                                                                    const pagePart = lastSegment.replace('.html', '').replace(/-/g, '');
+                                                                                                                                    document.querySelectorAll('.menu-item').forEach(item => {
+                                                                                                                                        const href = item.getAttribute('href') || '';
+                                                                                                                                        const hrefPage = href.split('/').pop()?.replace('.html', '').replace(/-/g, '') || '';
+                                                                                                                                        if (hrefPage && lastSegment.includes(hrefPage) || pageName.includes(hrefPage)) {
+                                                                                                                                            activeItem = item;
+                                                                                                                                        }
+                                                                                                                                    });
+                                                                                                                                }
+                                                                                                                            }
+                                                                                                            
+                                                                                                                            // Add active class to found item
+                                                                                                                            if (activeItem) {
+                                                                                                                                activeItem.classList.add('active');
+                                                                                                            
+                                                                                                                                // Expand parent menu group
+                                                                                                                                const parentGroup = activeItem.closest('.menu-group');
+                                                                                                                                if (parentGroup) {
+                                                                                                                                    parentGroup.classList.add('expanded');
+                                                                                                                                }
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                            
+                                                                                                                        // Run on page load
+                                                                                                                        if (document.readyState === 'loading') {
+                                                                                                                            document.addEventListener('DOMContentLoaded', highlightActiveMenuItem);
+                                                                                                                        } else {
+                                                                                                                            highlightActiveMenuItem();
+                                                                                                                        }
+                                                                                                                    })();
+                                                                                                                </script>
+                                                                                                            
+                                                    
+                                                        <!-- Global Navigation Sync Script -->
+                                                        <script>
+                                                            (function() {
+                                                                'use strict';
+                                                    
+                                                                // Auto-highlight active menu item based on current URL
+                                                                function highlightActiveMenuItem() {
+                                                                    const currentPath = window.location.pathname;
+                                                    
+                                                                    // Remove active class from all menu items
+                                                                    document.querySelectorAll('.menu-item').forEach(item => {
+                                                                        item.classList.remove('active');
+                                                                    });
+                                                    
+                                                                    // Find matching menu item
+                                                                    let activeItem = null;
+                                                    
+                                                                    // Exact match first
+                                                                    activeItem = document.querySelector(`.menu-item[href="${currentPath}"]`);
+                                                    
+                                                                    // If no exact match, try page name matching
+                                                                    if (!activeItem) {
+                                                                        const pageName = currentPath.split('/').pop()?.replace('.html', '') || '';
+                                                                        if (pageName) {
+                                                                            activeItem = document.querySelector(`.menu-item[data-page="${pageName}"]`);
+                                                                        }
+                                                                    }
+                                                    
+                                                                    // If still no match, try partial match
+                                                                    if (!activeItem && currentPath.includes('/user/')) {
+                                                                        const segments = currentPath.split('/');
+                                                                        const lastSegment = segments[segments.length - 1];
+                                                                        if (lastSegment) {
+                                                                            const pagePart = lastSegment.replace('.html', '').replace(/-/g, '');
+                                                                            document.querySelectorAll('.menu-item').forEach(item => {
+                                                                                const href = item.getAttribute('href') || '';
+                                                                                const hrefPage = href.split('/').pop()?.replace('.html', '').replace(/-/g, '') || '';
+                                                                                if (hrefPage && lastSegment.includes(hrefPage) || pageName.includes(hrefPage)) {
+                                                                                    activeItem = item;
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    }
+                                                    
+                                                                    // Add active class to found item
+                                                                    if (activeItem) {
+                                                                        activeItem.classList.add('active');
+                                                    
+                                                                        // Expand parent menu group
+                                                                        const parentGroup = activeItem.closest('.menu-group');
+                                                                        if (parentGroup) {
+                                                                            parentGroup.classList.add('expanded');
+                                                                        }
+                                                                    }
+                                                                }
+                                                    
+                                                                // Run on page load
+                                                                if (document.readyState === 'loading') {
+                                                                    document.addEventListener('DOMContentLoaded', highlightActiveMenuItem);
+                                                                } else {
+                                                                    highlightActiveMenuItem();
+                                                                }
+                                                            })();
+                                                        </script>
+                                                    
+                        
+                            <!-- Global Navigation Sync Script -->
+                            <script>
+                                (function() {
+                                    'use strict';
+                        
+                                    // Auto-highlight active menu item based on current URL
+                                    function highlightActiveMenuItem() {
+                                        const currentPath = window.location.pathname;
+                        
+                                        // Remove active class from all menu items
+                                        document.querySelectorAll('.menu-item').forEach(item => {
+                                            item.classList.remove('active');
+                                        });
+                        
+                                        // Find matching menu item
+                                        let activeItem = null;
+                        
+                                        // Exact match first
+                                        activeItem = document.querySelector(`.menu-item[href="${currentPath}"]`);
+                        
+                                        // If no exact match, try page name matching
+                                        if (!activeItem) {
+                                            const pageName = currentPath.split('/').pop()?.replace('.html', '') || '';
+                                            if (pageName) {
+                                                activeItem = document.querySelector(`.menu-item[data-page="${pageName}"]`);
+                                            }
+                                        }
+                        
+                                        // If still no match, try partial match
+                                        if (!activeItem && currentPath.includes('/user/')) {
+                                            const segments = currentPath.split('/');
+                                            const lastSegment = segments[segments.length - 1];
+                                            if (lastSegment) {
+                                                const pagePart = lastSegment.replace('.html', '').replace(/-/g, '');
+                                                document.querySelectorAll('.menu-item').forEach(item => {
+                                                    const href = item.getAttribute('href') || '';
+                                                    const hrefPage = href.split('/').pop()?.replace('.html', '').replace(/-/g, '') || '';
+                                                    if (hrefPage && lastSegment.includes(hrefPage) || pageName.includes(hrefPage)) {
+                                                        activeItem = item;
+                                                    }
+                                                });
+                                            }
+                                        }
+                        
+                                        // Add active class to found item
+                                        if (activeItem) {
+                                            activeItem.classList.add('active');
+                        
+                                            // Expand parent menu group
+                                            const parentGroup = activeItem.closest('.menu-group');
+                                            if (parentGroup) {
+                                                parentGroup.classList.add('expanded');
+                                            }
+                                        }
+                                    }
+                        
+                                    // Run on page load
+                                    if (document.readyState === 'loading') {
+                                        document.addEventListener('DOMContentLoaded', highlightActiveMenuItem);
+                                    } else {
+                                        highlightActiveMenuItem();
+                                    }
+                                })();
+                            </script>
+                        
+          
+              <!-- Global Navigation Sync Script -->
+              <script>
+                  (function() {
+                      'use strict';
+          
+                      // Auto-highlight active menu item based on current URL
+                      function highlightActiveMenuItem() {
+                          const currentPath = window.location.pathname;
+          
+                          // Remove active class from all menu items
+                          document.querySelectorAll('.menu-item').forEach(item => {
+                              item.classList.remove('active');
+                          });
+          
+                          // Find matching menu item
+                          let activeItem = null;
+          
+                          // Exact match first
+                          activeItem = document.querySelector(`.menu-item[href="${currentPath}"]`);
+          
+                          // If no exact match, try page name matching
+                          if (!activeItem) {
+                              const pageName = currentPath.split('/').pop()?.replace('.html', '') || '';
+                              if (pageName) {
+                                  activeItem = document.querySelector(`.menu-item[data-page="${pageName}"]`);
+                              }
+                          }
+          
+                          // If still no match, try partial match
+                          if (!activeItem && currentPath.includes('/user/')) {
+                              const segments = currentPath.split('/');
+                              const lastSegment = segments[segments.length - 1];
+                              if (lastSegment) {
+                                  const pagePart = lastSegment.replace('.html', '').replace(/-/g, '');
+                                  document.querySelectorAll('.menu-item').forEach(item => {
+                                      const href = item.getAttribute('href') || '';
+                                      const hrefPage = href.split('/').pop()?.replace('.html', '').replace(/-/g, '') || '';
+                                      if (hrefPage && lastSegment.includes(hrefPage) || pageName.includes(hrefPage)) {
+                                          activeItem = item;
+                                      }
+                                  });
+                              }
+                          }
+          
+                          // Add active class to found item
+                          if (activeItem) {
+                              activeItem.classList.add('active');
+          
+                              // Expand parent menu group
+                              const parentGroup = activeItem.closest('.menu-group');
+                              if (parentGroup) {
+                                  parentGroup.classList.add('expanded');
+                              }
+                          }
+                      }
+          
+                      // Run on page load
+                      if (document.readyState === 'loading') {
+                          document.addEventListener('DOMContentLoaded', highlightActiveMenuItem);
+                      } else {
+                          highlightActiveMenuItem();
+                      }
+                  })();
+              </script>
+          
+
+    <!-- Global Navigation Sync Script -->
+    <script>
+        (function() {
+            'use strict';
+
+            // Auto-highlight active menu item based on current URL
+            function highlightActiveMenuItem() {
+                const currentPath = window.location.pathname;
+
+                // Remove active class from all menu items
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                // Find matching menu item
+                let activeItem = null;
+
+                // Exact match first
+                activeItem = document.querySelector(`.menu-item[href="${currentPath}"]`);
+
+                // If no exact match, try page name matching
+                if (!activeItem) {
+                    const pageName = currentPath.split('/').pop()?.replace('.html', '') || '';
+                    if (pageName) {
+                        activeItem = document.querySelector(`.menu-item[data-page="${pageName}"]`);
+                    }
+                }
+
+                // If still no match, try partial match
+                if (!activeItem && currentPath.includes('/user/')) {
+                    const segments = currentPath.split('/');
+                    const lastSegment = segments[segments.length - 1];
+                    if (lastSegment) {
+                        const pagePart = lastSegment.replace('.html', '').replace(/-/g, '');
+                        document.querySelectorAll('.menu-item').forEach(item => {
+                            const href = item.getAttribute('href') || '';
+                            const hrefPage = href.split('/').pop()?.replace('.html', '').replace(/-/g, '') || '';
+                            if (hrefPage && lastSegment.includes(hrefPage) || pageName.includes(hrefPage)) {
+                                activeItem = item;
+                            }
+                        });
+                    }
+                }
+
+                // Add active class to found item
+                if (activeItem) {
+                    activeItem.classList.add('active');
+
+                    // Expand parent menu group
+                    const parentGroup = activeItem.closest('.menu-group');
+                    if (parentGroup) {
+                        parentGroup.classList.add('expanded');
+                    }
+                }
+            }
+
+            // Run on page load
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', highlightActiveMenuItem);
+            } else {
+                highlightActiveMenuItem();
+            }
+        })();
+    </script>
+
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="material-icons" style="font-size: 24px; color: #303133;">menu</i>
+                </button>
+                <h1 class="page-title">修改资料</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-dropdown" id="userDropdown">
+                    <i class="material-icons" style="font-size: 20px; color: #606266;">account_circle</i>
+                    <span id="header-username">加载中...</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div class="content-header ui-content-header">
+                <div class="container">
+                    <h1 class="content-heading">修改资料</h1>
+                </div>
+            </div>
+
+            <div class="container">
+                <section class="content-inner margin-top-no">
+                    <div class="row">
+                        <!-- Left Column -->
+                        <div class="col-xx-12 col-sm-6" id="edit-app">
+
+                            <!-- Group Network Selection -->
+                            <div class="card margin-bottom-no">
+                                <div class="card-main">
+                                    <div class="card-inner">
+                                        <div class="cardbtn-edit">
+                                            <div class="card-heading">分组 网络</div>
+                                            <button class="btn btn-flat" @click="updateGroup">
+                                                <i class="material-icons">check</i>
+                                            </button>
+                                        </div>
+                                        <p>设置您的需求，根据您的选择分配新节点,旧节点失效。设置完成,10分钟后生效,请重新获取节点。</p>
+                                        <div class="form-group form-group-label control-highlight-custom dropdown">
+                                            <label class="floating-label" for="group">请选择您的分组</label>
+                                            <select id="group" class="form-control maxwidth-edit" v-model="userGroup">
+                                                <option value="1">流量优先</option>
+                                                <option value="2">带宽优先</option>
+                                                <option value="3">延迟优先</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Password Change -->
+                            <div class="card margin-bottom-no">
+                                <div class="card-main">
+                                    <div class="card-inner">
+                                        <div class="cardbtn-edit">
+                                            <div class="card-heading">账号登录密码修改</div>
+                                            <button class="btn btn-flat" @click="updatePassword">
+                                                <i class="material-icons">check</i>
+                                            </button>
+                                        </div>
+                                        <div class="form-group form-group-label">
+                                            <label class="floating-label" for="oldpwd">当前密码</label>
+                                            <input class="form-control maxwidth-edit" id="oldpwd" v-model="passwordForm.oldpwd" type="password" placeholder="请输入当前密码">
+                                        </div>
+                                        <div class="form-group form-group-label">
+                                            <label class="floating-label" for="pwd">新密码</label>
+                                            <input class="form-control maxwidth-edit" id="pwd" v-model="passwordForm.pwd" type="password" placeholder="请输入新密码">
+                                        </div>
+                                        <div class="form-group form-group-label">
+                                            <label class="floating-label" for="repwd">确认新密码</label>
+                                            <input class="form-control maxwidth-edit" id="repwd" v-model="passwordForm.repwd" type="password" placeholder="请再次输入新密码">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Subscription Limit -->
+                            <div class="card margin-bottom-no">
+                                <div class="card-main">
+                                    <div class="card-inner">
+                                        <div class="cardbtn-edit">
+                                            <div class="card-heading">订阅获取节点数量设置</div>
+                                            <button class="btn btn-flat" @click="updateSubLimit">
+                                                <i class="material-icons">check</i>
+                                            </button>
+                                        </div>
+                                        <p>节点太多困扰了您?您可以在这里限制订阅获取的节点数量。</p>
+                                        <div class="form-group form-group-label">
+                                            <label class="floating-label" for="sub_limit">订阅节点数量</label>
+                                            <input class="form-control maxwidth-edit" id="sub_limit" v-model="subLimit" type="number" placeholder="0表示不限制">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Node Password Change -->
+                            <div class="card margin-bottom-no">
+                                <div class="card-main">
+                                    <div class="card-inner">
+                                        <div class="cardbtn-edit">
+                                            <div class="card-heading">节点密码修改</div>
+                                            <button class="btn btn-flat" @click="updateNodePassword">
+                                                <i class="material-icons">check</i>
+                                            </button>
+                                        </div>
+                                        <p>当前SS密码：<code class="skeleton">{{ nodePassword || '加载中...' }}</code></p>
+                                        <div class="form-group form-group-label">
+                                            <label class="floating-label" for="sspwd">输入新连接密码</label>
+                                            <input class="form-control maxwidth-edit" id="sspwd" v-model="newNodePassword" type="text" placeholder="留空则不修改">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contact Info -->
+                            <div class="card margin-bottom-no">
+                                <div class="card-main">
+                                    <div class="card-inner">
+                                        <div class="cardbtn-edit">
+                                            <div class="card-heading">联络方式修改</div>
+                                            <button class="btn btn-flat" @click="updateContact">
+                                                <i class="material-icons">check</i>
+                                            </button>
+                                        </div>
+                                        <p>当前联络方式：<code>{{ currentContactType }}</code></p>
+                                        <p>当前联络方式账号：<code>{{ currentContactValue }}</code></p>
+                                        <div class="form-group form-group-label">
+                                            <label class="floating-label" for="imtype">选择您的联络方式</label>
+                                            <select id="imtype" class="form-control maxwidth-edit" v-model="contactForm.imtype">
+                                                <option value="1">微信</option>
+                                                <option value="2">QQ</option>
+                                                <option value="3">Facebook</option>
+                                                <option value="4">Telegram</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group form-group-label">
+                                            <label class="floating-label" for="wechat">在这输入联络方式账号</label>
+                                            <input class="form-control maxwidth-edit" id="wechat" v-model="contactForm.wechat" type="text" placeholder="请输入账号">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Theme Selection -->
+                            <div class="card margin-bottom-no">
+                                <div class="card-main">
+                                    <div class="card-inner">
+                                        <div class="cardbtn-edit">
+                                            <div class="card-heading">主题修改</div>
+                                            <button class="btn btn-flat" @click="updateTheme">
+                                                <i class="material-icons">check</i>
+                                            </button>
+                                        </div>
+                                        <p>当前主题：<code>{{ currentTheme }}</code></p>
+                                        <div class="form-group form-group-label">
+                                            <label class="floating-label" for="theme">主题</label>
+                                            <select id="theme" class="form-control maxwidth-edit" v-model="selectedTheme">
+                                                <option value="material">material</option>
+                                                <option value="dark">dark</option>
+                                                <option value="blue">blue</option>
+                                                <option value="green">green</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="col-xx-12 col-sm-6">
+
+                            <!-- IP Unblock -->
+                            <div class="card margin-bottom-no">
+                                <div class="card-main">
+                                    <div class="card-inner">
+                                        <div class="cardbtn-edit">
+                                            <div class="card-heading">IP解封</div>
+                                            <button class="btn btn-flat" @click="unblockIP">
+                                                <i class="material-icons">not_interested</i>
+                                            </button>
+                                        </div>
+                                        <p>当前状态：<code>正常</code></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://unpkg.com/element-plus"></script>
+
+    <script>
+        function toggleMenu(menuId, element) {
+            const menuGroup = element.closest('.menu-group');
+            menuGroup.classList.toggle('expanded');
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.getElementById('menuToggle');
+            if (menuToggle) {
+                menuToggle.addEventListener('click', toggleSidebar);
+            }
+        });
+
+        const { createApp, ref, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const userGroup = ref('1');
+                const passwordForm = ref({
+                    oldpwd: '',
+                    pwd: '',
+                    repwd: ''
+                });
+                const subLimit = ref(0);
+                const nodePassword = ref('');
+                const newNodePassword = ref('');
+                const contactForm = ref({
+                    imtype: '4',
+                    wechat: ''
+                });
+                const currentContactType = ref('Telegram');
+                const currentContactValue = ref('');
+                const currentTheme = ref('material');
+                const selectedTheme = ref('material');
+
+                // Fetch user info
+                const fetchUserInfo = async () => {
+                    const token = localStorage.getItem('spanel_jwt_token');
+
+                    try {
+                        const response = await SPanelAPI.get('/api/user/info'));
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            const user = data.user || data;
+
+                            // Update form fields
+                            userGroup.value = user.node_group?.toString() || '1';
+                            subLimit.value = user.sub_limit || 0;
+                            nodePassword.value = user.passwd || '';
+                            contactForm.value.imtype = user.im_type?.toString() || '4';
+                            contactForm.value.wechat = user.im_value || '';
+                            currentTheme.value = user.theme || 'material';
+                            selectedTheme.value = user.theme || 'material';
+
+                            // Update display
+                            const typeMap = { '1': '微信', '2': 'QQ', '3': 'Facebook', '4': 'Telegram' };
+                            currentContactType.value = typeMap[contactForm.value.imtype] || 'Telegram';
+                            currentContactValue.value = user.im_value || '';
+
+                            // Update header username
+                            const usernameEl = document.getElementById('header-username');
+                            if (usernameEl) {
+                                usernameEl.textContent = user.user_name || user.email || '用户';
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Failed to fetch user info:', error);
+                    }
+                };
+
+                // Update group
+                const updateGroup = async () => {
+                    const token = localStorage.getItem('spanel_jwt_token');
+
+                    try {
+                        const response = await SPanelAPI.post('/api/user/group', { group: userGroup.value });
+
+                        if (response.ok) {
+                            ElementPlus.ElMessage.success('分组设置成功');
+                        } else {
+                            ElementPlus.ElMessage.error('设置失败');
+                        }
+                    } catch (error) {
+                        ElementPlus.ElMessage.error('设置失败');
+                    }
+                };
+
+                // Update password
+                const updatePassword = async () => {
+                    if (!passwordForm.value.oldpwd || !passwordForm.value.pwd || !passwordForm.value.repwd) {
+                        ElementPlus.ElMessage.warning('请填写所有字段');
+                        return;
+                    }
+
+                    if (passwordForm.value.pwd !== passwordForm.value.repwd) {
+                        ElementPlus.ElMessage.warning('两次输入的密码不一致');
+                        return;
+                    }
+
+                    const token = localStorage.getItem('spanel_jwt_token');
+
+                    try {
+                        const response = await SPanelAPI.post('/api/user/password', passwordForm.value);
+
+                        if (response.ok) {
+                            ElementPlus.ElMessage.success('密码修改成功');
+                            passwordForm.value = { oldpwd: '', pwd: '', repwd: '' };
+                        } else {
+                            const data = await response.json();
+                            ElementPlus.ElMessage.error(data.message || '密码修改失败');
+                        }
+                    } catch (error) {
+                        ElementPlus.ElMessage.error('密码修改失败');
+                    }
+                };
+
+                // Update subscription limit
+                const updateSubLimit = async () => {
+                    const token = localStorage.getItem('spanel_jwt_token');
+
+                    try {
+                        const response = await SPanelAPI.post('/api/user/sublimit', { sub_limit: subLimit.value });
+
+                        if (response.ok) {
+                            ElementPlus.ElMessage.success('订阅节点数量设置成功');
+                        } else {
+                            ElementPlus.ElMessage.error('设置失败');
+                        }
+                    } catch (error) {
+                        ElementPlus.ElMessage.error('设置失败');
+                    }
+                };
+
+                // Update node password
+                const updateNodePassword = async () => {
+                    if (!newNodePassword.value) {
+                        ElementPlus.ElMessage.warning('请输入新密码');
+                        return;
+                    }
+
+                    const token = localStorage.getItem('spanel_jwt_token');
+
+                    try {
+                        const response = await SPanelAPI.post('/api/user/sspwd', { sspwd: newNodePassword.value });
+
+                        if (response.ok) {
+                            ElementPlus.ElMessage.success('节点密码修改成功');
+                            nodePassword.value = newNodePassword.value;
+                            newNodePassword.value = '';
+                        } else {
+                            ElementPlus.ElMessage.error('修改失败');
+                        }
+                    } catch (error) {
+                        ElementPlus.ElMessage.error('修改失败');
+                    }
+                };
+
+                // Update contact
+                const updateContact = async () => {
+                    const token = localStorage.getItem('spanel_jwt_token');
+
+                    try {
+                        const response = await SPanelAPI.post('/api/user/wechat', {
+                                wechat: contactForm.value.wechat,
+                                imtype: contactForm.value.imtype
+                            });
+
+                        if (response.ok) {
+                            ElementPlus.ElMessage.success('联络方式修改成功');
+                            fetchUserInfo(); // Refresh display
+                        } else {
+                            ElementPlus.ElMessage.error('修改失败');
+                        }
+                    } catch (error) {
+                        ElementPlus.ElMessage.error('修改失败');
+                    }
+                };
+
+                // Update theme
+                const updateTheme = async () => {
+                    const token = localStorage.getItem('spanel_jwt_token');
+
+                    try {
+                        const response = await SPanelAPI.post('/api/user/theme', { theme: selectedTheme.value });
+
+                        if (response.ok) {
+                            ElementPlus.ElMessage.success('主题修改成功，页面将重新加载');
+                            setTimeout(() => window.location.reload(), 1000);
+                        } else {
+                            ElementPlus.ElMessage.error('修改失败');
+                        }
+                    } catch (error) {
+                        ElementPlus.ElMessage.error('修改失败');
+                    }
+                };
+
+                // Unblock IP
+                const unblockIP = async () => {
+                    const token = localStorage.getItem('spanel_jwt_token');
+
+                    try {
+                        const response = await SPanelAPI.post('/api/user/unblock', {});
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            ElementPlus.ElMessage.success('IP解封成功：' + data.msg);
+                        } else {
+                            ElementPlus.ElMessage.error('解封失败');
+                        }
+                    } catch (error) {
+                        ElementPlus.ElMessage.error('解封失败');
+                    }
+                };
+
+                onMounted(() => {
+                    fetchUserInfo();
+                });
+
+                return {
+                    userGroup,
+                    passwordForm,
+                    subLimit,
+                    nodePassword,
+                    newNodePassword,
+                    contactForm,
+                    currentContactType,
+                    currentContactValue,
+                    currentTheme,
+                    selectedTheme,
+                    updateGroup,
+                    updatePassword,
+                    updateSubLimit,
+                    updateNodePassword,
+                    updateContact,
+                    updateTheme,
+                    unblockIP
+                };
+            }
+        }).mount('#edit-app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPanel - Next Generation Proxy Panel</title>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg">
+
+    <!-- SPanel Material Design CSS -->
+    <link href="/theme/material/css/base.min.css" rel="stylesheet">
+    <link href="/theme/material/css/project.min.css" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            text-align: center;
+            color: white;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .features {
+            margin-top: 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+        }
+
+        .feature {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .feature h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .feature p {
+            font-size: 14px;
+            opacity: 0.8;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SPanel</h1>
+        <p>Next Generation Proxy Panel - Powered by Bun + Vue 3</p>
+
+        <div class="btn-group">
+            <a href="/auth/login.html" class="btn btn-primary">登录</a>
+            <a href="/auth/register.html" class="btn btn-secondary">注册</a>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <h3>🚀 高性能</h3>
+                <p>基于 Bun 运行时，提供极致性能体验</p>
+            </div>
+            <div class="feature">
+                <h3>🎨 Material Design</h3>
+                <p>完美复刻 SPanel Material Design 界面</p>
+            </div>
+            <div class="feature">
+                <h3>🔒 安全可靠</h3>
+                <p>JWT 认证，端到端加密传输</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

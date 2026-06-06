@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- Auth Guard: Auto-redirect to login if not authenticated -->
+    <script>
+    (function() {
+      const token = localStorage.getItem('spanel_jwt_token');
+      const isUserPage = window.location.pathname.includes('/user/');
+      const isAdminPage = window.location.pathname.includes('/admin/');
+      if (!token && (isUserPage || isAdminPage)) {
+        window.location.href = '/auth/login.html';
+      }
+    })();
+    </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户管理 - SPanel</title>
+  <link rel="icon" type="image/svg+xml" href="/vite.svg">
+  <script type="module" crossorigin src="/assets/admin/users-D2pKtBrd.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/assets/vue-vendor-k0iSlyGv.js">
+  <link rel="modulepreload" crossorigin href="/assets/element-plus-0NBP0_0Z.js">
+  <link rel="modulepreload" crossorigin href="/assets/router-guard-Df7N2WPS.js">
+  <link rel="modulepreload" crossorigin href="/assets/_plugin-vue_export-helper-DlAUqK2U.js">
+  <link rel="stylesheet" crossorigin href="/assets/users-BsA-xrak.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-Ckocv65N.css">
+  <script type="module" crossorigin src="/assets/modulepreload-polyfill-B5Qt9EMX.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+</body>
+</html>

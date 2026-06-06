@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" name="viewport">
+    <meta name="theme-color" content="#4285f4">
+    <title>SPanel - 注册</title>
+
+    <!-- Auth Guard: Auto-redirect if already logged in -->
+    <script>
+    (function() {
+      const token = localStorage.getItem('spanel_jwt_token');
+      const isAuthPage = window.location.pathname.includes('/auth/');
+      if (token && isAuthPage) {
+        window.location.href = '/user/index.html';
+      }
+    })();
+    </script>
+
+    <!-- SPanel Material Design CSS -->
+    <link href="/theme/material/css/base.min.css" rel="stylesheet">
+    <link href="/theme/material/css/project.min.css" rel="stylesheet">
+    <link href="/theme/material/css/auth.css" rel="stylesheet">
+    <link href="https://fonts.loli.net/css?family=Roboto:300,300italic,400,400italic,500,500italic|Material+Icons" rel="stylesheet">
+
+    <!-- Element Plus for Message Feedback -->
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+
+    <style>
+        .divcss5{ position:fixed; bottom:0;}
+        .rowtocol {
+            margin-bottom: 15px;
+        }
+        .btn-reg {
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="page-brand">
+
+<div class="authpage auth-reg">
+    <div class="container">
+        <section class="content-inner">
+            <div class="auth-main auth-row">
+                <div class="auth-top auth-row">
+                    <a class="boardtop-left" href="/">
+                        <div>首 页</div>
+                    </a>
+                    <div class="auth-logo">
+                        <img src="/images/authlogo.jpg" alt="SPanel Logo">
+                    </div>
+                    <a href="/auth/login.html" class="boardtop-right">
+                        <div>登 录</div>
+                    </a>
+                </div>
+
+                <form id="register-form" @keydown="handleKeyPress">
+                    <div class="rowtocol">
+                        <div class="auth-row">
+                            <div class="form-group-label auth-row">
+                                <label class="floating-label" for="name">昵称</label>
+                                <input
+                                    class="form-control maxwidth-auth"
+                                    id="name"
+                                    v-model="name"
+                                    type="text"
+                                    placeholder="请输入昵称"
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rowtocol">
+                        <div class="auth-row">
+                            <div class="form-group-label auth-row">
+                                <label class="floating-label" for="email">邮箱(唯一凭证)</label>
+                                <input
+                                    class="form-control maxwidth-auth"
+                                    id="email"
+                                    v-model="email"
+                                    type="text"
+                                    maxlength="64"
+                                    placeholder="请输入邮箱"
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rowtocol">
+                        <div class="auth-row">
+                            <div class="form-group-label auth-row">
+                                <label class="floating-label" for="passwd">密码</label>
+                                <input
+                                    class="form-control maxwidth-auth"
+                                    id="passwd"
+                                    v-model="password"
+                                    type="password"
+                                    placeholder="请输入密码"
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rowtocol">
+                        <div class="auth-row">
+                            <div class="form-group form-group-label">
+                                <label class="floating-label" for="repasswd">重复密码</label>
+                                <input
+                                    class="form-control maxwidth-auth"
+                                    id="repasswd"
+                                    v-model="repassword"
+                                    type="password"
+                                    placeholder="请再次输入密码"
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rowtocol">
+                        <div class="auth-row">
+                            <div class="form-group form-group-label dropdown">
+                                <label class="floating-label" for="imtype">选择您的联络方式</label>
+                                <button
+                                    class="form-control maxwidth-auth"
+                                    id="imtype"
+                                    type="button"
+                                    @click="showImTypeDropdown = !showImTypeDropdown"
+                                >
+                                    {{ imTypeLabel }}
+                                </button>
+                                <ul class="dropdown-menu" v-show="showImTypeDropdown" aria-labelledby="imtype">
+                                    <li><a href="#" class="dropdown-option" @click.prevent="selectImType(4, 'Telegram')">Telegram</a></li>
+                                    <li><a href="#" class="dropdown-option" @click.prevent="selectImType(3, 'Facebook')">Facebook</a></li>
+                                    <li><a href="#" class="dropdown-option" @click.prevent="selectImType(1, 'Wechat')">Wechat</a></li>
+                                    <li><a href="#" class="dropdown-option" @click.prevent="selectImType(2, 'QQ')">QQ</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rowtocol">
+                        <div class="auth-row">
+                            <div class="form-group form-group-label">
+                                <label class="floating-label" for="wechat">在这输入联络方式账号</label>
+                                <input
+                                    class="form-control maxwidth-auth"
+                                    id="wechat"
+                                    v-model="contact"
+                                    type="text"
+                                    :placeholder="imTypePlaceholder"
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rowtocol">
+                        <div class="auth-row">
+                            <div class="form-group form-group-label">
+                                <label class="floating-label" for="code">邀请码</label>
+                                <input
+                                    class="form-control maxwidth-auth"
+                                    id="code"
+                                    v-model="inviteCode"
+                                    type="text"
+                                    placeholder="可选"
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rowtocol">
+                        <div class="btn-auth auth-row">
+                            <button
+                                id="register-btn"
+                                type="button"
+                                @click="handleRegister"
+                                :disabled="loading"
+                                class="btn-reg btn btn-block btn-brand waves-attach waves-light"
+                            >
+                                {{ loading ? '注册中...' : '确认注册' }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="auth-bottom auth-row auth-reg">
+                    <div class="tgauth">
+                        <p>注册即代表同意<a href="/tos">服务条款</a>，以及保证所录入信息的真实性，如有不实信息会导致账号被删除。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="card auth-tg">
+            <div class="card-main"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Vue 3 -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<!-- Element Plus -->
+<script src="https://unpkg.com/element-plus"></script>
+<!-- SPanel Material Design JS -->
+<script src="/theme/material/js/project.min.js"></script>
+
+<script>
+    const { createApp, ref, computed } = Vue
+
+    createApp({
+        setup() {
+            const name = ref('')
+            const email = ref('')
+            const password = ref('')
+            const repassword = ref('')
+            const imtype = ref(1)
+            const contact = ref('')
+            const inviteCode = ref('')
+            const loading = ref(false)
+            const showImTypeDropdown = ref(false)
+
+            // IM Type labels
+            const imTypeLabels = {
+                1: 'Wechat',
+                2: 'QQ',
+                3: 'Facebook',
+                4: 'Telegram'
+            }
+
+            const imTypeLabel = computed(() => imTypeLabels[imtype.value] || '请选择')
+
+            const imTypePlaceholder = computed(() => {
+                return `请输入${imTypeLabels[imtype.value]}账号`
+            })
+
+            const selectImType = (type, label) => {
+                imtype.value = type
+                showImTypeDropdown.value = false
+            }
+
+            // 显示消息提示
+            const showMessage = (message, type = 'info') => {
+                ElementPlus.ElMessage({
+                    message,
+                    type,
+                    duration: 3000
+                })
+            }
+
+            // 处理注册
+            const handleRegister = async () => {
+                console.log('[Register Attempt] Email:', email.value, 'Name:', name.value)
+
+                // 基本验证
+                if (!name.value) {
+                    showMessage('请输入昵称', 'warning')
+                    return
+                }
+                if (!email.value) {
+                    showMessage('请输入邮箱', 'warning')
+                    return
+                }
+                if (!password.value) {
+                    showMessage('请输入密码', 'warning')
+                    return
+                }
+                if (password.value !== repassword.value) {
+                    showMessage('两次密码输入不一致', 'warning')
+                    return
+                }
+                if (!contact.value) {
+                    showMessage('请输入联络方式', 'warning')
+                    return
+                }
+
+                loading.value = true
+
+                try {
+                    const response = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: email.value,
+                            name: name.value,
+                            password: password.value,
+                            imtype: imtype.value,
+                            contact: contact.value,
+                            inviteCode: inviteCode.value
+                        })
+                    })
+
+                    const data = await response.json()
+                    console.log('[Register Response]', data)
+
+                    // Check if register successful (has token or success=true)
+                    if (data.token || data.success || data.data?.token) {
+                        showMessage('注册成功！正在跳转到登录页...', 'success')
+
+                        setTimeout(() => {
+                            window.location.href = '/auth/login.html'
+                        }, 2000)
+                    } else {
+                        showMessage(data.message || '注册失败', 'error')
+                    }
+                } catch (error) {
+                    console.error('[Register Error]', error)
+                    showMessage('网络错误，请稍后重试', 'error')
+                } finally {
+                    loading.value = false
+                }
+            }
+
+            // 回车提交
+            const handleKeyPress = (event) => {
+                if (event.key === 'Enter' && !loading.value) {
+                    handleRegister()
+                }
+            }
+
+            return {
+                name,
+                email,
+                password,
+                repassword,
+                imtype,
+                contact,
+                inviteCode,
+                loading,
+                showImTypeDropdown,
+                imTypeLabel,
+                imTypePlaceholder,
+                selectImType,
+                handleRegister,
+                handleKeyPress
+            }
+        }
+    }).mount('#register-form')
+</script>
+
+</body>
+</html>
