@@ -1,5 +1,23 @@
 <template>
   <div class="dashboard-container">
+    <!-- Loading State -->
+    <div v-if="loading && !userData.user" class="loading-container">
+      <el-icon class="is-loading"><Loading /></el-icon>
+      <p>正在加载仪表盘...</p>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="!userData.user && !loading" class="error-container">
+      <el-result icon="error" title="加载失败" sub-title="无法加载用户数据，请尝试刷新页面或重新登录">
+        <template #extra>
+          <el-button type="primary" @click="fetchUserData">重新加载</el-button>
+          <el-button @click="handleLogout">返回登录</el-button>
+        </template>
+      </el-result>
+    </div>
+
+    <!-- Main Content -->
+    <template v-else>
     <!-- Header -->
     <el-header class="dashboard-header">
       <div class="header-content">
@@ -399,6 +417,7 @@
         </el-col>
       </el-row>
     </el-main>
+    </template>
   </div>
 </template>
 
@@ -420,7 +439,8 @@ import {
   View,
   Iphone,
   MagicStick,
-  Warning
+  Warning,
+  Loading
 } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { api, handleApiResponse } from '@/shared/api/eden-client'
@@ -638,19 +658,41 @@ async function handleHttpResponse(responsePromise: Promise<Response>) {
 }
 
 // Lifecycle
-onMounted(() => {
-  // Check auth
-  if (!auth.isLoggedIn()) {
-    auth.logout()
-    return
+onMounted(async () => {
+  try {
+    // Check auth first
+    if (!auth.isLoggedIn()) {
+      console.warn('[Dashboard] User not logged in, redirecting...')
+      auth.logout()
+      return
+    }
+
+    console.log('[Dashboard] User authenticated, fetching data...')
+
+    // Fetch data with better error handling
+    // Don't await all - let them run in parallel
+    // Each function has its own try-catch
+    fetchUserData().catch(err => {
+      console.error('[Dashboard] Failed to fetch user data:', err)
+      // Don't throw - let the component render with empty data
+    })
+
+    fetchTrafficHistory().catch(err => {
+      console.error('[Dashboard] Failed to fetch traffic history:', err)
+      // Non-critical, continue
+    })
+
+    fetchSubscription().catch(err => {
+      console.error('[Dashboard] Failed to fetch subscription:', err)
+      // Non-critical, continue
+    })
+
+    console.log('[Dashboard] Data fetch initiated')
+  } catch (error) {
+    console.error('[Dashboard] Error during initialization:', error)
+    // Show error but don't crash the app
+    ElMessage.error('加载仪表盘时出错，请刷新页面重试')
   }
-
-  // Fetch data
-  fetchUserData()
-  fetchTrafficHistory()
-
-  // Fetch subscription
-  fetchSubscription()
 })
 </script>
 
@@ -921,5 +963,32 @@ onMounted(() => {
   .traffic-value {
     font-size: 16px;
   }
+}
+
+/* Loading & Error States */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 20px;
+}
+
+.loading-container .el-icon {
+  font-size: 48px;
+  color: var(--el-color-primary);
+}
+
+.loading-container p {
+  font-size: 16px;
+  color: var(--el-text-color-secondary);
+}
+
+.error-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
 }
 </style>

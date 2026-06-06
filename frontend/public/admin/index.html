@@ -16,5 +16,40 @@
 </head>
 <body>
   <div id="app"></div>
+
+  <!-- ============================================
+       🛡️ Pre-Vue Authentication Guard
+       ============================================ -->
+  <script>
+    (function() {
+      'use strict';
+
+      // Check for JWT token in localStorage
+      const token = localStorage.getItem('spanel_jwt_token');
+
+      if (!token) {
+        console.warn('[Admin Auth Guard] No JWT token found, redirecting to login...');
+        window.location.href = '/auth/login.html';
+        return;
+      }
+
+      // Parse token to check admin privileges
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (!payload.isAdmin && !payload.is_admin) {
+          console.warn('[Admin Auth Guard] Admin privileges required');
+          alert('需要管理员权限才能访问此页面');
+          window.location.href = '/user/index.html';
+          return;
+        }
+      } catch (error) {
+        console.error('[Admin Auth Guard] Invalid token, redirecting to login...');
+        window.location.href = '/auth/login.html';
+        return;
+      }
+
+      console.log('[Admin Auth Guard] Admin user authenticated, proceeding...');
+    })();
+  </script>
 </body>
 </html>

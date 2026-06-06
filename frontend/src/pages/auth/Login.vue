@@ -35,8 +35,12 @@
 
         <el-form-item>
           <div class="links">
-            <a href="/auth/register.html">注册账号</a>
-            <a href="/auth/resetpassword.html">忘记密码？</a>
+            <el-link href="/auth/register.html" type="primary">
+              注册账号
+            </el-link>
+            <el-link href="/auth/resetpassword.html" type="info">
+              忘记密码？
+            </el-link>
           </div>
         </el-form-item>
       </el-form>
@@ -115,6 +119,9 @@ const handleLogin = async () => {
   width: 100%;
   max-width: 450px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .card-header {
@@ -129,15 +136,13 @@ const handleLogin = async () => {
 .links {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  width: 100%;
 }
 
-.links a {
-  color: #409eff;
-  text-decoration: none;
+.links .el-link {
   font-size: 14px;
 }
-
-.links a:hover {
-  text-decoration: underline;
-}
 </style>
+// test comment

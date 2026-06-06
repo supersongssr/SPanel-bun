@@ -76,10 +76,10 @@ export class AuthManager {
     try {
       localStorage.removeItem(this.TOKEN_KEY)
       localStorage.removeItem(this.USER_KEY)
-      
-      // Redirect to login page
+
+      // Redirect to login page - FIXED: Use /auth/login.html
       if (typeof window !== 'undefined') {
-        window.location.href = '/user/login.html'
+        window.location.href = '/auth/login.html'
       }
     } catch (error) {
       console.error('Failed to logout:', error)

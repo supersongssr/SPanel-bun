@@ -122,7 +122,7 @@ onMounted(async () => {
 // Logout
 const logout = async () => {
   await authLogout()
-  window.location.href = '/login.html'
+  window.location.href = '/auth/login.html'
 }
 
 // Format bytes

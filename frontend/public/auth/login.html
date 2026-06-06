@@ -1,13 +1,303 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-cn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录 - SPanel</title>
-    <link rel="icon" type="image/svg+xml" href="/vite.svg">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" name="viewport">
+    <meta name="theme-color" content="#4285f4">
+    <title>SPanel - 登录</title>
+
+    <!-- Auth Guard: Auto-redirect if already logged in -->
+    <script>
+    (function() {
+      const token = localStorage.getItem('spanel_jwt_token');
+      const isAuthPage = window.location.pathname.includes('/auth/');
+      if (token && isAuthPage) {
+        window.location.href = '/user/index.html';
+      }
+    })();
+    </script>
+
+    <!-- SPanel Material Design CSS -->
+    <link href="/theme/material/css/base.min.css" rel="stylesheet">
+    <link href="/theme/material/css/project.min.css" rel="stylesheet">
+    <link href="/theme/material/css/auth.css" rel="stylesheet">
+    <link href="https://fonts.loli.net/css?family=Roboto:300,300italic,400,400italic,500,500italic|Material+Icons" rel="stylesheet">
+
+    <!-- Element Plus for Message Feedback -->
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+
+    <style>
+        .divcss5{ position:fixed; bottom:0;}
+        /* Static-First: Skeleton loading states */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+            color: transparent !important;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
 </head>
-<body>
-    <div id="app"></div>
-    <script type="module" src="/src/pages/auth/login-main.ts"></script>
+<body class="page-brand">
+
+<div class="authpage">
+    <div class="container">
+        <form action="javascript:void(0);" method="POST" id="login-form" @keydown="handleKeyPress">
+            <div class="auth-main auth-row auth-col-one">
+                <div class="auth-top auth-row">
+                    <a class="boardtop-left" href="/">
+                        <div>首 页</div>
+                    </a>
+                    <div class="auth-logo">
+                        <img src="/images/authlogo.jpg" alt="SPanel Logo">
+                    </div>
+                    <a href="/auth/register.html" class="boardtop-right">
+                        <div>注 册</div>
+                    </a>
+                </div>
+
+                <div class="auth-row">
+                    <div class="form-group-label auth-row row-login">
+                        <label class="floating-label" for="email">邮箱</label>
+                        <input
+                            class="form-control maxwidth-auth"
+                            id="email"
+                            v-model="email"
+                            type="text"
+                            name="Email"
+                            placeholder="请输入邮箱"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="auth-row">
+                    <div class="form-group-label auth-row row-login">
+                        <label class="floating-label" for="passwd">密码</label>
+                        <input
+                            class="form-control maxwidth-auth"
+                            id="passwd"
+                            v-model="password"
+                            type="password"
+                            name="Password"
+                            placeholder="请输入密码"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="auth-row">
+                    <div class="form-group-label auth-row row-login">
+                        <label class="floating-label" for="code">两步验证码（未设置请忽略）</label>
+                        <input
+                            class="form-control maxwidth-auth"
+                            id="code"
+                            v-model="code"
+                            type="text"
+                            name="Code"
+                            placeholder="未设置请留空"
+                        >
+                    </div>
+                </div>
+
+                <div class="btn-auth auth-row">
+                    <button
+                        id="login"
+                        type="button"
+                        @click="handleLogin"
+                        :disabled="loading"
+                        class="btn btn-block btn-brand waves-attach waves-light"
+                    >
+                        {{ loading ? '登录中...' : '确认登录' }}
+                    </button>
+                </div>
+
+                <div class="auth-help auth-row">
+                    <div class="auth-help-table auth-row">
+                        <div class="checkbox checkbox-adv">
+                            <label for="remember_me">
+                                <input class="access-hide" value="week" id="remember_me" name="remember_me" type="checkbox">
+                                记住我
+                                <span class="checkbox-circle"></span>
+                                <span class="checkbox-circle-check"></span>
+                                <span class="checkbox-circle-check"></span>
+                                <span class="checkbox-circle-icon icon">done</span>
+                            </label>
+                        </div>
+                        <a href="/password/reset">忘记密码？</a>
+                    </div>
+                </div>
+
+                <div class="auth-bottom auth-row">
+                    <div class="tgauth">
+                        <span>Telegram</span>
+                        <button class="btn" id="calltgauth" style="cursor: not-allowed; opacity: 0.5;">
+                            <i class="icon icon-lg">near_me</i>
+                        </button>
+                        <span>快捷登录（开发中）</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Telegram Login Modal (Placeholder) -->
+        <div class="card auth-tg cust-model" style="display: none;">
+            <div class="card-main">
+                <nav class="tab-nav margin-top-no margin-bottom-no">
+                    <ul class="nav nav-justified">
+                        <li class="active">
+                            <a class="waves-attach" data-toggle="tab" href="#number_login">一键/验证码登录</a>
+                        </li>
+                        <li>
+                            <a class="waves-attach" data-toggle="tab" href="#qrcode_login">二维码登录</a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="tab-pane fade active in" id="number_login">
+                    <div class="card-header">
+                        <div class="card-inner">
+                            <h1 class="card-heading" style="text-align:center;font-weight:bold;">Telegram登录</h1>
+                        </div>
+                    </div>
+                    <div class="card-inner">
+                        <div class="text-center">
+                            <p>一键登陆</p>
+                        </div>
+                        <p>正在载入 Telegram，如果长时间未显示请刷新页面或检查代理</p>
+                        <div class="text-center" id="telegram-login-box"></div>
+                        <p>或者添加机器人账号，发送下面的数字给它。</p>
+                        <div class="text-center">
+                            <h2><code id="code_number">加载中...</code></h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="qrcode_login">
+                    <div class="card-header">
+                        <div class="card-inner">
+                            <h1 class="card-heading" style="text-align:center;font-weight:bold;">Telegram扫码登录</h1>
+                        </div>
+                    </div>
+                    <div class="card-inner">
+                        <p>添加机器人账号，拍下下面这张二维码发给它。</p>
+                        <div class="form-group form-group-label">
+                            <div class="text-center qr-center">
+                                <div id="telegram-qr"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vue 3 -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<!-- Element Plus -->
+<script src="https://unpkg.com/element-plus"></script>
+<!-- SPanel Material Design JS (project.min.js contains the main functionality) -->
+<script src="/theme/material/js/project.min.js"></script>
+
+<script>
+    const { createApp, ref } = Vue
+
+    createApp({
+        setup() {
+            const email = ref('')
+            const password = ref('')
+            const code = ref('')
+            const loading = ref(false)
+
+            // 显示消息提示
+            const showMessage = (message, type = 'info') => {
+                ElementPlus.ElMessage({
+                    message,
+                    type,
+                    duration: 3000
+                })
+            }
+
+            // 处理登录
+            const handleLogin = async () => {
+                console.log('[Login Attempt] Email:', email.value, 'Has password:', !!password.value)
+
+                // 基本验证
+                if (!email.value) {
+                    showMessage('请输入邮箱', 'warning')
+                    return
+                }
+                if (!password.value) {
+                    showMessage('请输入密码', 'warning')
+                    return
+                }
+
+                loading.value = true
+
+                try {
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: email.value,
+                            password: password.value,
+                            code: code.value
+                        })
+                    })
+
+                    const data = await response.json()
+                    console.log('[Login Response]', data)
+
+                    // Check if login successful (has token or success=true)
+                    if (data.token || data.success || data.data?.token) {
+                        // 保存 JWT token
+                        const token = data.token || data.data?.token
+                        if (token) {
+                            localStorage.setItem('spanel_jwt_token', token)
+                            console.log('[Login Success] Token saved:', token.substring(0, 20) + '...')
+                        }
+
+                        showMessage('登录成功！正在跳转...', 'success')
+
+                        // 统一跳转到用户面板
+                        setTimeout(() => {
+                            window.location.href = '/user/index.html'
+                        }, 1000)
+                    } else {
+                        showMessage(data.message || '登录失败', 'error')
+                    }
+                } catch (error) {
+                    console.error('[Login Error]', error)
+                    showMessage('网络错误，请稍后重试', 'error')
+                } finally {
+                    loading.value = false
+                }
+            }
+
+            // 回车登录
+            const handleKeyPress = (event) => {
+                if (event.key === 'Enter' && !loading.value) {
+                    handleLogin()
+                }
+            }
+
+            return {
+                email,
+                password,
+                code,
+                loading,
+                handleLogin,
+                handleKeyPress
+            }
+        }
+    }).mount('#login-form')
+</script>
+
 </body>
 </html>

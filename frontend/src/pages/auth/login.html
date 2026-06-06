@@ -5,9 +5,239 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录 - SPanel</title>
     <link rel="icon" type="image/svg+xml" href="/vite.svg">
+
+    <!-- Critical CSS for auth page -->
+    <style>
+        /* ============================================
+           LAYER 1: Static Layout for Login Form
+           Visible IMMEDIATELY on page load
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            color: #303133;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #606266;
+            font-size: 14px;
+            font-weight: 500;
+            width: 80px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: #409eff;
+        }
+
+        .form-input::placeholder {
+            color: #c0c4cc;
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            width: 100%;
+            padding: 12px 20px;
+            background: #409eff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #66b1ff;
+        }
+
+        .btn-primary:disabled {
+            background: #c0c4cc;
+            cursor: not-allowed;
+        }
+
+        /* Links */
+        .links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .auth-link {
+            font-size: 14px;
+            color: #409eff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .auth-link:hover {
+            color: #66b1ff;
+        }
+
+        .auth-link.secondary {
+            color: #909399;
+        }
+
+        .auth-link.secondary:hover {
+            color: #a6a9ad;
+        }
+
+        /* Error States */
+        .error-message {
+            display: none;
+            color: #f56c6c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .form-group.has-error .form-input {
+            border-color: #f56c6c;
+        }
+
+        .form-group.has-error .error-message {
+            display: block;
+        }
+
+        /* Loading State */
+        .btn-primary .loading-text {
+            display: none;
+        }
+
+        .btn-primary.loading .loading-text {
+            display: inline;
+        }
+
+        .btn-primary.loading .normal-text {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 20px;
+            }
+
+            .card-header h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- ============================================
+         LAYER 2: Static Form Skeleton
+         Visible IMMEDIATELY, before JS loads
+         ============================================ -->
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="card-header">
+                <h2>SPanel 登录</h2>
+            </div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="email">邮箱</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-input"
+                        placeholder="请输入邮箱"
+                        autocomplete="email"
+                    >
+                    <div class="error-message" id="email-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">密码</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-input"
+                        placeholder="请输入密码"
+                        autocomplete="current-password"
+                    >
+                    <div class="error-message" id="password-error"></div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submit-btn">
+                    <span class="normal-text">登录</span>
+                    <span class="loading-text">登录中...</span>
+                </button>
+
+                <div class="links">
+                    <a href="/auth/register.html" class="auth-link">注册账号</a>
+                    <a href="/auth/resetpassword.html" class="auth-link secondary">忘记密码？</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================
+         LAYER 3: Vue App Mount Point
+         Vue will enhance the static form
+         ============================================ -->
     <div id="app"></div>
-    <script type="module" src="./login-main.ts"></script>
+
+    <!-- ============================================
+         LAYER 4: Progressive Enhancement
+         This adds validation and API handling
+         ============================================ -->
+    <script type="module" src="./login-enhance.ts"></script>
 </body>
 </html>

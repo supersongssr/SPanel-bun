@@ -10,12 +10,6 @@ import { auth } from './auth'
  * Pages that don't require authentication
  */
 const PUBLIC_PAGES = [
-  '/login.html',
-  '/register.html',
-  '/user/login.html',
-  '/user/register.html',
-  '/auth/',
-  '/auth/index.html',
   '/auth/login.html',
   '/auth/register.html',
   '/auth/resetpassword.html',
@@ -23,10 +17,13 @@ const PUBLIC_PAGES = [
 
 /**
  * Pages where logged-in users should be redirected based on role (SSO)
+ *
+ * IMPORTANT: Root path '/' is NOT in this list - it's the public portal/landing page
+ * and should always be accessible regardless of authentication status
  */
 const SSO_REDIRECT_PAGES = [
-  '/',
-  '/index.html',
+  // '/',  // REMOVED: Root path is public portal, never redirect
+  // '/index.html',  // REMOVED: Same as root path
   '/auth/',
   '/auth/index.html',
   '/auth/login.html',
@@ -103,6 +100,8 @@ function handleSSORedirect(): void {
  * @returns true if authenticated, false if redirected
  */
 export function checkAuth(): boolean {
+  const currentUrl = window.location.href
+
   // Check if user is logged in
   if (!auth.isLoggedIn()) {
     // Not logged in - only allow public pages
@@ -110,9 +109,8 @@ export function checkAuth(): boolean {
       return true
     }
 
-    // Redirect to login
-    const currentUrl = window.location.href
-    const loginUrl = isAdminPage() ? '/admin/login.html' : '/auth/'
+    // Redirect to login - FIXED: Always use /auth/login.html
+    const loginUrl = '/auth/login.html'
 
     console.warn('User not authenticated, redirecting to login...')
 

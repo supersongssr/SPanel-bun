@@ -52,8 +52,12 @@
 
         <el-form-item>
           <div class="links">
-            <a href="/auth/login.html">已有账号？登录</a>
-            <a href="/">返回首页</a>
+            <el-link href="/auth/login.html" type="primary">
+              已有账号？登录
+            </el-link>
+            <el-link href="/" type="info">
+              返回首页
+            </el-link>
           </div>
         </el-form-item>
       </el-form>
@@ -115,12 +119,18 @@ const handleRegister = async () => {
 
     loading.value = true
     try {
-      await register({
-        email: form.email,
-        user_name: form.username,
-        pass: form.password,
-        code: form.inviteCode,
-      })
+      // FIXED: Use correct field names matching backend schema
+      // Backend expects: { email?, user_name, password, inviteCode? }
+      const registrationData = {
+        email: form.email || undefined, // Optional, but provide if set
+        user_name: String(form.username), // Ensure string type
+        password: String(form.password), // FIXED: backend expects 'password', not 'pass'
+        inviteCode: form.inviteCode || undefined, // FIXED: backend expects 'inviteCode', not 'code'
+      }
+
+      console.log('[Register] Submitting registration:', registrationData)
+
+      await register(registrationData)
 
       ElMessage.success('注册成功！请登录')
 
@@ -129,7 +139,8 @@ const handleRegister = async () => {
         window.location.href = '/auth/login.html'
       }, 1500)
     } catch (error: any) {
-      ElMessage.error(error.message || '注册失败')
+      console.error('[Register] Registration failed:', error)
+      ElMessage.error(error.message || '注册失败，请重试')
     } finally {
       loading.value = false
     }
@@ -151,6 +162,9 @@ const handleRegister = async () => {
   width: 100%;
   max-width: 450px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .card-header {
@@ -165,15 +179,12 @@ const handleRegister = async () => {
 .links {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  width: 100%;
 }
 
-.links a {
-  color: #409eff;
-  text-decoration: none;
+.links .el-link {
   font-size: 14px;
-}
-
-.links a:hover {
-  text-decoration: underline;
 }
 </style>

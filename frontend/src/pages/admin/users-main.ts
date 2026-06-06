@@ -8,6 +8,7 @@ import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import UserManagement from './UserManagement.vue'
 import { checkAuth, setupTokenExpiryCheck } from '@/shared/utils/router-guard'
+import { auth } from '@/shared/utils/auth'
 
 // Check authentication and admin privileges
 if (!checkAuth()) {
@@ -15,7 +16,7 @@ if (!checkAuth()) {
 }
 
 // Double check admin privileges
-if (!require('@/shared/utils/auth').auth.isAdmin()) {
+if (!auth.isAdmin()) {
   alert('需要管理员权限才能访问此页面')
   window.location.href = '/index.html'
   throw new Error('Admin privileges required')
