@@ -5,8 +5,8 @@
 ## 测试文件
 
 ### 1. Python测试脚本
-- **文件:** `test_api.py` (位于项目根目录)
-- **运行:** `python3 test_api.py`
+- **文件:** `tests/debug/test_api.py` (位于 `tests/debug/` 目录)
+- **运行:** `python3 tests/debug/test_api.py`
 - **依赖:** `requests`
 - **说明:** 使用Python requests库测试所有API端点
 
@@ -20,8 +20,7 @@
 
 ### Python测试
 ```bash
-cd /root/git/spanel-bun/backend
-python3 test_api.py
+python3 tests/debug/test_api.py
 ```
 
 ### TypeScript测试

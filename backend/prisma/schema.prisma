@@ -1,0 +1,353 @@
+// This is your Prisma schema file,
+// learn more in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - 完善版本，兼容旧版 PHP SPanel
+model User {
+  id                Int       @id @default(autoincrement())
+  email             String?   @unique
+  username          String?   @unique
+  pass              String?   @map("pass") // Legacy password hash (MD5/SHA256/Argon2i)
+  password          String?   @map("password") // New password field (bcrypt)
+  token             String?   @unique
+  uuid              String?   @unique @db.VarChar(64)
+
+  // Traffic fields (流量相关字段 - 使用 BigInt)
+  t                 BigInt    @default(0) @map("t") // Last usage time
+  u                 BigInt    @default(0) @map("u") // Upload traffic in bytes
+  d                 BigInt    @default(0) @map("d") // Download traffic in bytes
+  transferEnable    BigInt    @default(0) @map("transfer_enable") // Total traffic limit in bytes
+  port              Int?      @map("port") // Allocated port
+
+  // Account status (账户状态)
+  expireIn          DateTime? @map("expire_in") // Account expiration time
+  userGroupId       Int?      @default(0) @map("node_group") // Node group permission
+  planId            String?   @map("plan_id") @db.VarChar(32)
+  class             Int?      @default(0) @map("class") // User level/class
+  nodeSpeedlimit    BigInt?   @default(0) @map("node_speedlimit") // Speed limit in bps
+
+  // Check-in (签到相关)
+  lastCheckinTime   Int?      @default(0) @map("last_checkin_time")
+  lastCheckinIp     String?   @map("last_checkin_ip") @db.VarChar(255)
+
+  // Registration (注册相关)
+  regIp             String?   @map("reg_ip") @db.VarChar(255)
+
+  // Balance & Referral (余额和邀请)
+  money             Decimal?  @default(0) @map("money") @db.Decimal(10, 2)
+  refBy             Int?      @default(0) @map("ref_by") // Referrer ID
+  refByCount        Int?      @default(0) @map("ref_by_count") // Referral count
+
+  // Admin & Agent (管理员和代理)
+  isAdmin           Boolean   @default(false) @map("is_admin")
+  isAgent           Boolean   @default(false) @map("is_agent")
+  isBanned          Boolean   @default(false) @map("is_banned")
+  isEmailBanned     Boolean   @default(false) @map("is_email_banned")
+  bannedReason      String?   @map("banned_reason")
+
+  // Theme & UI
+  theme             String?   @default("material") @map("theme")
+
+  // Telegram
+  telegramId        String?   @map("telegram_id") @db.VarChar(32)
+
+  // SS/SSR specific fields (SS/SSR 特定字段)
+  method            String?   @map("method") @db.VarChar(32) // Encryption method
+  protocol          String?   @map("protocol") @db.VarChar(32)
+  protocolParam     String?   @map("protocol_param") @db.Text
+  obfs              String?   @map("obfs") @db.VarChar(32)
+  obfsParam         String?   @map("obfs_param") @db.Text
+
+  // Forbidden IP/Port
+  forbiddenIp       String?   @map("forbidden_ip") @db.Text
+  forbiddenPort     String?   @map("forbidden_port") @db.Text
+
+  // Timestamps
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  orders            Order[]
+  tickets           Ticket[]
+  trafficLogs       TrafficLog[]
+  inviteCodes       InviteCode[]        @relation("Inviter")
+  boughtRecords     Bought[]
+  paybackRecords    Payback[]           @relation("Received")
+  givenPaybacks     Payback[]           @relation("Given")
+
+  @@index([email])
+  @@index([username])
+  @@index([port])
+  @@map("user")
+}
+
+// Node model - 完善版本
+model Node {
+  id                Int       @id @default(autoincrement())
+  name              String    @map("name")
+  server            String    @map("server")
+
+  // Node type (节点类型)
+  type              Int?      @default(1) @map("sort") // 1=SS, 2=SSR, 3=V2Ray, 4=Trojan
+  protocol          String?   @map("type") @default("shadowsocks") @db.VarChar(32)
+
+  // Connection (连接配置)
+  method            String?   @map("method") @default("aes-256-gcm") @db.VarChar(32)
+  info              String?   @map("info") @db.VarChar(32)
+  host              String?   @map("host")
+  customMethod      String?   @map("custom_method") @db.VarChar(255)
+
+  // Traffic & Speed (流量和速度)
+  trafficRate       String?   @default("1.0") @map("traffic_rate") @db.VarChar(32)
+  nodeSpeedlimit    String?   @default("0") @map("node_speedlimit") @db.VarChar(32)
+
+  // Status (状态)
+  status            String?   @default("available") @map("status") @db.VarChar(10)
+  isOnline          Boolean?  @default(false) @map("is_online")
+  onlineUserCount   Int?      @default(0) @map("online_user")
+
+  // Heartbeat & Monitoring (心跳和监控)
+  nodeHeartbeat     Int?      @default(0) @map("node_heartbeat")
+  lastPingTime      Int?      @default(0) @map("last_ping_time")
+  load              String?   @default("0.00") @map("load")
+
+  // Node classification (节点分类)
+  nodeGroup         Int?      @default(0) @map("node_group")
+  nodeClass         Int?      @default(0) @map("node_class")
+  region            String?   @map("region") @db.VarChar(255)
+  nodeIp            String?   @map("node_ip") @db.VarChar(255)
+
+  // Mu protocol (单端口多用户)
+  muPort            Int?      @map("mu_port")
+  muRegex           String?   @map("mu_regex")
+
+  // Timestamps
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  trafficLogs       TrafficLog[]
+
+  @@index([status])
+  @@index([nodeGroup, nodeClass])
+  @@map("node")
+}
+
+// Traffic Log model - 流量日志
+model TrafficLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nodeId      Int      @map("node_id")
+  node        Node     @relation(fields: [nodeId], references: [id])
+  u           BigInt   @default(0) @map("u") // Upload traffic in bytes
+  d           BigInt   @default(0) @map("d") // Download traffic in bytes
+  rate        Float?   @default(1.0) @map("rate")
+  traffic     BigInt?  @map("traffic") // Total traffic
+  logTime     Int      @map("log_time") // Log timestamp
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+
+  @@index([userId, logTime])
+  @@index([nodeId, logTime])
+  @@map("user_traffic_log")
+}
+
+// Code model - 充值码
+model Code {
+  id            Int      @id @default(autoincrement())
+  code          String   @unique
+  type          Int      @default(1) // 1=invite, 2=recharge, -2=other
+  number        Int?     @map("number") // Recharge amount
+  isused        Boolean? @default(false) @map("isused")
+  userId        Int?     @map("userid")
+  usedatetime   DateTime? @map("usedatetime")
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+
+  @@index([code])
+  @@map("code")
+}
+
+// Invite Code model - 邀请码
+model InviteCode {
+  id          Int       @id @default(autoincrement())
+  code        String    @unique @db.VarChar(32)
+  userId      Int       @map("user_id") // Creator ID
+  user        User      @relation("Inviter", fields: [userId], references: [id])
+  usedUserId  Int?      @map("used_userid")
+  createdAt   Int       @map("created_at")
+  usedAt      Int?      @map("used_at")
+  status      Int       @default(1) // 1=available, 0=unavailable
+
+  @@index([code])
+  @@index([userId])
+  @@map("invite_code")
+}
+
+// Bought model - 购买记录
+model Bought {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("userid")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shop        String   @db.Text // Purchase content (JSON)
+  datetime    DateTime @default(now())
+  renew       Int?     @default(0) // 0=new, 1=renew
+  price       BigInt   @map("price") // Price in cents
+  coupon      String?  @map("coupon") @db.VarChar(255)
+
+  @@index([userId])
+  @@map("bought")
+}
+
+// Payback model - 返利记录
+model Payback {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("userid") // User who receives payback
+  refUserId   Int      @map("ref_userid") // User who referred
+  user        User     @relation("Received", fields: [userId], references: [id], onDelete: Cascade)
+  refUser     User     @relation("Given", fields: [refUserId], references: [id], onDelete: Cascade)
+  refGet      BigInt   @map("ref_get") // Payback amount in cents
+  datetime    DateTime @default(now())
+
+  @@index([userId])
+  @@index([refUserId])
+  @@map("payback")
+}
+
+// Coupon model - 优惠券
+model Coupon {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique @db.VarChar(255)
+  onetime     Int?     @default(0)
+  credit      BigInt   @map("credit") // Coupon value
+  shop        String?  @db.Text // Applicable items (JSON)
+  useLimit    Int?     @map("use_limit")
+  usedCount   Int?     @default(0) @map("used_count")
+  expire      DateTime @map("expire")
+
+  @@index([code])
+  @@map("coupon")
+}
+
+// Order model - 订单
+model Order {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @map("userid")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId          Int?     @map("plan_id")
+  status          Int      @default(0) // 0=unpaid, 1=paid, 2=cancelled, 3=expired
+  amount          BigInt
+  paymentMethod   String?  @map("payment_method") @db.VarChar(32)
+  paymentId       String?  @unique @map("payment_id")
+  isNotified      Boolean? @default(false) @map("is_notified")
+
+  // Timestamps
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@map("order")
+}
+
+// Ticket model - 工单
+model Ticket {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("userid")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  content     String   @db.Text
+  status      Int      @default(0) // 0=open, 1=replied, 2=closed
+  reply       String?  @db.Text
+  replyAt     DateTime? @map("replyat")
+
+  // Timestamps
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@map("ticket")
+}
+
+// Config model - 系统配置
+model Config {
+  id          Int      @id @default(autoincrement())
+  item        String   @unique @map("item") @db.VarChar(255)
+  value       String   @db.Text @map("value")
+  class       Int?     @map("class")
+
+  // Timestamps
+  updatedAt   DateTime @updatedAt
+
+  @@map("config")
+}
+
+// Announcement model - 公告
+model Announcement {
+  id          Int      @id @default(autoincrement())
+  date        DateTime @default(now()) @map("date")
+  content     String   @db.Text @map("content")
+
+  @@map("announcement")
+}
+
+// Link model - 订阅链接
+model Link {
+  id          Int      @id @default(autoincrement())
+  type        Int
+  address     String   @db.Text
+  port        Int
+  token       String   @db.Text
+  ios         Int      @default(0)
+  userId      BigInt   @map("userid")
+  isp         String?  @db.Text
+  geo         Int?
+  method      String?  @db.Text
+
+  @@index([userId])
+  @@map("link")
+}
+
+// DetectLog model - 节点检测日志
+model DetectLog {
+  id          Int      @id @default(autoincrement())
+  nodeId      Int      @map("node_id")
+  logTime     Int      @map("log_time")
+
+  @@index([nodeId])
+  @@map("detect_log")
+}
+
+// AliveIp model - 活跃IP
+model AliveIp {
+  id          BigInt   @id @default(autoincrement())
+  nodeid      Int
+  userid      Int
+  ip          String   @db.Text
+  datetime    BigInt
+
+  @@index([nodeid])
+  @@index([userid])
+  @@map("alive_ip")
+}
+
+// NodeOnlineLog model - 节点在线日志
+model NodeOnlineLog {
+  id          Int      @id @default(autoincrement())
+  nodeId      Int      @map("node_id")
+  onlineUser  Int      @map("online_user") @default(0)
+  logTime     Int      @map("log_time")
+
+  @@index([nodeId])
+  @@map("node_online_log")
+}
