@@ -1,0 +1,48 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e6]:
+    - link "首 页" [ref=e7] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e8]: 首 页
+    - img "SPanel Logo" [ref=e10]
+    - link "登 录" [ref=e11] [cursor=pointer]:
+      - /url: /auth/login.html
+      - generic [ref=e12]: 登 录
+  - generic [ref=e13]:
+    - generic [ref=e16]:
+      - generic [ref=e17]: 昵称
+      - textbox "昵称" [ref=e18]:
+        - /placeholder: 请输入昵称
+    - generic [ref=e21]:
+      - generic [ref=e22]: 邮箱(唯一凭证)
+      - textbox "邮箱(唯一凭证)" [active] [ref=e23]:
+        - /placeholder: 请输入邮箱
+        - text: refactor-test-1780814898520-9134@test.com
+    - generic [ref=e26]:
+      - generic [ref=e27]: 密码
+      - textbox "密码" [ref=e28]:
+        - /placeholder: 请输入密码
+    - generic [ref=e31]:
+      - generic [ref=e32]: 重复密码
+      - textbox "重复密码" [ref=e33]:
+        - /placeholder: 请再次输入密码
+    - generic [ref=e36]:
+      - generic [ref=e37]: 选择您的联络方式
+      - button "选择您的联络方式" [ref=e38] [cursor=pointer]: Wechat
+    - generic [ref=e41]:
+      - generic [ref=e42]: 在这输入联络方式账号
+      - textbox "在这输入联络方式账号" [ref=e43]:
+        - /placeholder: 请输入Wechat账号
+    - generic [ref=e46]:
+      - generic [ref=e47]: 邀请码
+      - textbox "邀请码" [ref=e48]:
+        - /placeholder: 可选
+    - button "确认注册" [ref=e51] [cursor=pointer]
+  - paragraph [ref=e54]:
+    - text: 注册即代表同意
+    - link "服务条款" [ref=e55] [cursor=pointer]:
+      - /url: /tos
+    - text: ，以及保证所录入信息的真实性，如有不实信息会导致账号被删除。
+```

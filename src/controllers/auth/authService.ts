@@ -105,7 +105,7 @@ export async function handleLogin(body: any, set: any) {
   });
 
   // 6. 签署 JWT 授权凭据
-  const token = await signToken(user.id, user.isAdmin === 1);
+  const token = await signToken(user.id, user.isAdmin === 1, user.userName);
 
   return {
     status: 'success',

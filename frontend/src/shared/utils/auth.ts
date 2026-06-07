@@ -152,7 +152,7 @@ export class AuthManager {
    */
   static isAdmin(): boolean {
     const payload = this.parseToken()
-    return payload?.isAdmin === true
+    return payload?.isAdmin === true || payload?.isAdmin === 1 || payload?.isAdmin === '1'
   }
 }
 

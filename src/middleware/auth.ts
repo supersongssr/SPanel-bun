@@ -8,8 +8,12 @@ const JWT_KEY = new TextEncoder().encode(JWT_SECRET_STR);
  * 为已成功鉴权的用户签署 JWT 会话令牌
  * 有效期设为 7 天，兼顾运维便利与基本安全
  */
-export async function signToken(userId: number, isAdmin: boolean): Promise<string> {
-  return await new SignJWT({ userId, isAdmin: isAdmin ? 1 : 0 })
+export async function signToken(userId: number, isAdmin: boolean, userName?: string): Promise<string> {
+  return await new SignJWT({ 
+    userId, 
+    isAdmin: isAdmin ? true : false,
+    user_name: userName || ''
+  })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
@@ -24,7 +28,7 @@ export async function verifyToken(token: string): Promise<{ userId: number; isAd
     const { payload } = await jwtVerify(token, JWT_KEY);
     return {
       userId: payload.userId as number,
-      isAdmin: payload.isAdmin === 1,
+      isAdmin: payload.isAdmin === true || payload.isAdmin === 1,
     };
   } catch (error) {
     return null;

@@ -171,7 +171,7 @@ export const adminUserController = new Elysia({ prefix: '/admin' })
     }
 
     // 签发目标用户的 Token (isAdmin 为 false，因为是以目标用户的身份登录)
-    const token = await signToken(targetUid, false);
+    const token = await signToken(targetUid, false, rows[0].userName);
 
     return {
       status: 'success',
